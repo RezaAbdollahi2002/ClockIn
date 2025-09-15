@@ -24,7 +24,7 @@ const Navbar = ({ messageState }) => {
   return (
     <>
       {/* Navbar */}
-      <div className="grid grid-cols-2 px-2 bg-[#35175C] w-full py-2 items-center justify-between text-white font-semibold">
+      <div className="grid grid-cols-2 px-2 bg-[#1a1365] w-full py-2 items-center justify-between text-white font-semibold fixed top-0 z-50">
         {/* Left side */}
         <div className="hidden md:flex md:gap-3 items-center ">
           <Link
@@ -95,7 +95,7 @@ const Navbar = ({ messageState }) => {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-[#35175C] text-white transform ${
+        className={`fixed top-0 left-0 h-full w-64 bg-[#1a1365] text-white transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-500 ease-in-out z-50`}
       >

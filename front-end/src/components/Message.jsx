@@ -19,6 +19,7 @@ const Message = ({ onClose }) => {
   const [messageText, setMessageText] = useState("");
   const [role, setRole] = useState("");
   const [showImage, setShowImage] = useState(false);
+  const [firstName, setFirstName] = useState(null);
 
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
@@ -42,6 +43,8 @@ const Message = ({ onClose }) => {
   }, [userId]);
 
 
+
+
   const fetchConversations = async () => {
     const res = await axios.get(`${BASE_URL}conversations/${userId}`);
     setConversations(res.data);
@@ -50,6 +53,38 @@ const Message = ({ onClose }) => {
   useEffect(() => {
     fetchConversations();
   }, [userId]);
+
+  useEffect(() => {
+    const fetchInfoAndCleanConversations = async () => {
+      try {
+        const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
+        const fetchedFirstName = res.data.first_name || "employee";
+        console.log(res.data.first_name)
+        setFirstName(fetchedFirstName);
+        console.log("First name: " + fetchedFirstName);
+
+        setConversations(prev =>
+          prev.map(conv => {
+            if (conv.name && (( conv.name.includes(" and ") ) ||  (conv.name.includes(",") ) ) ) {
+              const splitName = conv.name.split(" and ");
+              return {
+                ...conv,
+                name: splitName[0] === fetchedFirstName ? splitName[1] : splitName[0],
+              };
+            }
+            return conv;
+          })
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (userId) fetchInfoAndCleanConversations();
+  }, [userId]);
+
+
+
 
   // Cleanup WebSocket on unmount
   useEffect(() => {
@@ -106,7 +141,7 @@ const Message = ({ onClose }) => {
         id: res.data.message_id,
         sender_id: userId,
         text: text,
-        attachment_url: res.data.attachment_url || null,   
+        attachment_url: res.data.attachment_url || null,
         attachment_type: res.data.attachment_type || null,
         created_at: res.data.created_at || new Date().toISOString(),
       },
@@ -167,6 +202,19 @@ const Message = ({ onClose }) => {
     }
   };
 
+  const conversationNameConvertor = async ({ conv, userId }) => {
+    try {
+      const resp = await axios.get(`/api/employees/settings/${userId}/employee-info`).then((res) => setFirstName(res.data.first_name)).catch((err) => console.error(err));
+      console.log("first_name: " + firstName)
+    } catch (err) {
+      console.error(err);
+    }
+    const name = conv.name
+    if (firstName in name) {
+
+    }
+  }
+
 
 
 
@@ -193,22 +241,26 @@ const Message = ({ onClose }) => {
                 </button>
 
               </div>
-
+              {/* Conversations finder  */}
               <h2 className="font-bold mb-2 text-center mt-2 text-lg lg:text-xl">Conversations</h2>
               <ul className="flex-1 overflow-y-auto ">
-                {conversations.map((conv) => (
-                  <li
-                    key={conv.id}
-                    className="cursor-pointer bg-[#542B6F] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
-                    onClick={() => openConversation(conv)}
-                  >
-                    <div className="flex justify-between">
-                      <span>{conv.name}</span>
-                      <span className="text-xs text-gray-400">
-                        {new Date(conv.last_message_at).toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </li>
+                {conversations.map((conv,index) => (
+                  <div key={index}>
+                    {() => conversationNameConvertor(conv, userId)}
+                    <li
+                      key={index}
+                      className="cursor-pointer bg-[#542B6F] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
+                      onClick={() => openConversation(conv)}
+                    >
+                      <div className="flex justify-between">
+                        <span>{conv.name}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(conv.last_message_at).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </li>
+                  </div>
+
                 ))}
               </ul>
               <button

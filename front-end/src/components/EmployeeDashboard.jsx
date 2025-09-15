@@ -24,31 +24,32 @@ const EmployeeDashboard = ({ message, setMessage }) => {
   }, [employeeId]);
 
   return (
-    <div className="bg-white min-h-screen relative top-0 pt-8">
-      <h1 className="md:text-3xl text-xl font-semibold text-center mb-2 text-black">
+    <div className="bg-[#FEFEFE] min-h-screen relative top-0 pt-8">
+      <h1 className="md:text-3xl text-xl font-semibold text-center mt-10 mb-2 text-[#0f0c45]">
         Welcome Back, {employeeName}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 ">
         {/* Left panel */}
-        
-          <div className="col-span-1 md:col-span-4 lg:col-span-2  rounded-xl p-4 shadow overflow-auto max-h-[90vh] bg-gray-200">
-            <h2 className="text-xl font-bold mb-3 mx-4 text-black">Announcements</h2>
-            <div className="px-6">
-              < EmployeeAnnouncement />
-            </div>
-            <EmployeeShiftsDashboard employee_id={employeeId} />
+
+        <div className="col-span-1 md:col-span-4 lg:col-span-2 border border-sm border-[#1a1365] bg-transparent  rounded-xl p-4 shadow-3xl overflow-auto max-h-[90vh] ">
+          <h2 className="text-xl font-bold mb-3 mx-4 text-[#0f0c45]">Announcements</h2>
+          <div className="px-6">
+            < EmployeeAnnouncement />
           </div>
-       
+          <EmployeeShiftsDashboard employee_id={employeeId} />
+
+        </div>
+
 
         {/* Right panel */}
 
         {/* Right panel */}
-        
-          <div className="col-span-1 md:col-span-4 lg:col-span-2  rounded-xl p-4 shadow h-full bg-gray-200">
-            <EmployeeShiftWeeklyReviw employeeId={employeeId} />
-          </div>
-        
+
+        <div className="col-span-1 md:col-span-4 lg:col-span-2 text-[#0f0c45] rounded-xl p-4 border border-sm border-[#1a1365] shadow-3xl h-full ">
+          <EmployeeShiftWeeklyReviw employeeId={employeeId} />
+        </div>
+
 
       </div>
 

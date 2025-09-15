@@ -48,7 +48,7 @@ const WeeklyReview = ({ employeeId }) => {
   return (
     <div className="flex flex-col gap-y-8 ">
             <div className="p-4 rounded-lg shadow-xl bg-white w-full max-w-full">
-            <h2 className="text-lg font-bold mb-4">Your Week</h2>
+            <h2 className="text-lg font-bold mb-4 text-[#0f0c45]">Your Week</h2>
 
             {/* Date Picker */}
             <div className="mb-4">
@@ -85,7 +85,7 @@ const WeeklyReview = ({ employeeId }) => {
             
             </div>
             <div className="p-4 rounded-lg shadow-xl bg-white w-full max-w-full flex flex-col">
-                <p className="text-black font-semibold">Upcoming Time Off</p>
+                <p className="text-[#0f0c45] font-semibold">Upcoming Time Off</p>
                 <div className="items-center mx-auto mt-4">
                     {
                     timeOffRequest ? (
