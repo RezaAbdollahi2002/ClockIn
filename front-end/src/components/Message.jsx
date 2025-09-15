@@ -54,35 +54,56 @@ const Message = ({ onClose }) => {
     fetchConversations();
   }, [userId]);
 
-  useEffect(() => {
-    const fetchInfoAndCleanConversations = async () => {
-      try {
-        const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
-        const fetchedFirstName = res.data.first_name || "employee";
-        console.log(res.data.first_name)
-        setFirstName(fetchedFirstName);
-        console.log("First name: " + fetchedFirstName);
+  // 1. Fetch user info once
+useEffect(() => {
+  const fetchUserInfo = async () => {
+    try {
+      const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
+      const fetchedFirstName = res.data.first_name || "employee";
+      setFirstName(fetchedFirstName);
+      console.log("Fetched first name:", fetchedFirstName);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-        setConversations(prev =>
-          prev.map(conv => {
-            if (conv.name && (( conv.name.includes(" and ") ) ||  (conv.name.includes(",") ) ) ) {
-              const splitName = conv.name.split(" and ");
-              return {
-                ...conv,
-                name: splitName[0] === fetchedFirstName ? splitName[1] : splitName[0],
-              };
-            }
-            return conv;
-          })
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  if (userId) fetchUserInfo();
+}, [userId]);
 
-    if (userId) fetchInfoAndCleanConversations();
-  }, [userId]);
+// 2. Fetch & clean conversations
+const fetchConversationsNames = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}conversations/${userId}`);
+    let data = res.data;
 
+    // Clean names right here using firstName
+    if (firstName) {
+      data = data.map(conv => {
+        if (conv.name && conv.name.includes(" and ")) {
+          const splitName = conv.name.split(" and ");
+          return {
+            ...conv,
+            name: splitName[0] === firstName ? splitName[1] : splitName[0],
+          };
+        }
+        return conv;
+      });
+    }
+
+    setConversations(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// 3. Load conversations when userId OR firstName is ready
+useEffect(() => {
+  if (userId && firstName) {
+    fetchConversationsNames();
+  }
+}, [userId, firstName,conversations]);
+
+  
 
 
 
@@ -244,12 +265,12 @@ const Message = ({ onClose }) => {
               {/* Conversations finder  */}
               <h2 className="font-bold mb-2 text-center mt-2 text-lg lg:text-xl">Conversations</h2>
               <ul className="flex-1 overflow-y-auto ">
-                {conversations.map((conv,index) => (
-                  <div key={index}>
+                {conversations.map((conv, index) => (
+                  <div >
                     {() => conversationNameConvertor(conv, userId)}
                     <li
                       key={index}
-                      className="cursor-pointer bg-[#542B6F] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
+                      className="cursor-pointer bg-[#062D5B] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
                       onClick={() => openConversation(conv)}
                     >
                       <div className="flex justify-between">
