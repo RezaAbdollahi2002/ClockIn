@@ -202,9 +202,6 @@ class AvailabilityStatus(str, enum.Enum):
 
 class EmployeeAvailability(Base):
     __tablename__ = "employee_availabilities"
-    __table_args__ = (
-        Index("ix_avail_emp_start", "employee_id", "start_date"),
-    )
 
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
@@ -214,9 +211,22 @@ class EmployeeAvailability(Base):
 
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=True)
-    day_of_week = Column(Integer, nullable=True)
-    start_time = Column(Time, nullable=True)
-    end_time = Column(Time, nullable=True)
+    # Each day has start & end columns
+    monday_start = Column(Time, nullable=True)
+    monday_end   = Column(Time, nullable=True)
+    tuesday_start = Column(Time, nullable=True)
+    tuesday_end   = Column(Time, nullable=True)
+    wednesday_start = Column(Time, nullable=True)
+    wednesday_end   = Column(Time, nullable=True)
+    thursday_start = Column(Time, nullable=True)
+    thursday_end   = Column(Time, nullable=True)
+    friday_start = Column(Time, nullable=True)
+    friday_end   = Column(Time, nullable=True)
+    saturday_start = Column(Time, nullable=True)
+    saturday_end   = Column(Time, nullable=True)
+    sunday_start = Column(Time, nullable=True)
+    sunday_end   = Column(Time, nullable=True)
+
     description = Column(String(200), nullable=True)
     status = Column(String, default="pending")
 

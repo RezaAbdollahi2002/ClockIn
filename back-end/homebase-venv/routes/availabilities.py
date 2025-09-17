@@ -1,42 +1,33 @@
-
-from typing import Optional, List, Set
-from datetime import datetime
-import schemas
-from fastapi.responses import JSONResponse
-
-from fastapi import (
-    APIRouter, Depends, UploadFile, File, Form, WebSocket,
-    WebSocketDisconnect, HTTPException, Query, Request
-)
-from database import Session
-import schemas
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+from typing import List
+from datetime import date, time, timedelta
 from database import get_db
 import models
+import schemas
+from datetime import datetime
+
+
 
 router = APIRouter(prefix="/availabilities", tags=["Availabilities"])
 
-# -------------- Create Availabilities ----------------
-@router.post("/create-availabilities")
-def create_availabilities(request: schemas.AvailabilityCreate, db: Session = Depends(get_db)):
-    new_availability = models.EmployeeAvailability(
-        employee_id=request.employee_id,
-        type=models.AvailabilityType(request.type),
-        name=request.name,
-        start_date=request.start_date,
-        end_date=request.end_date,
-        day_of_week=request.day_of_week,
-        start_time=request.start_time,
-        end_time=request.end_time,
-        description=request.description
-    )
+@router.post("/create-availability",response_model=schemas.AvailabilityRead )
+def create_availability(request= schemas.AvailabilityBase,db:Session=Depends(get_db)):
+    # Create SQLAlchemy model from Pydantic schema
+    new_availability = models.EmployeeAvailability(**request.dict())
+
     db.add(new_availability)
     db.commit()
     db.refresh(new_availability)
-    return {"message": "Availability created successfully", "availability": new_availability}
 
-@router.get('/get-employee-availabilities', response_model=List[schemas.AvailabilityResponse])
-def get_availabilities(employee_id: int, db: Session = Depends(get_db)):
-    availabilities = db.query(models.EmployeeAvailability).filter(
-        models.EmployeeAvailability.employee_id == employee_id
-    ).all()
-    return availabilities
+    return new_availability
+
+
+@router.delete("/delete-availabilitiy")
+def remove_availability(availability_id: int, db:Session=Depends(get_db)):
+    availability = db.query(models.EmployeeAvailability).filter(models.EmployeeAvailability.id == availability_id).first()
+    if not availability:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No availabilities found")
+    models.EmployeeAvailability.delete(availability)
+    models.EmployeeAvailability.commit()
+    return {"status" : "Availability has removed successfuly."}

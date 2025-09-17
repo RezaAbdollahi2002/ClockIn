@@ -34,7 +34,7 @@
     "mdb-react-ui-kit": "^9.0.0",
     "ogl": "^1.0.11",
     "react": "^19.1.0",
-    "react-datepicker": "^8.4.0",
+    "react-datepicker": "^8.7.0",
     "react-dom": "^19.1.0",
     "react-flatpickr": "^4.0.11",
     "react-hook-form": "^7.62.0",
