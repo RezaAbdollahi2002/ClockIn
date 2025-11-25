@@ -142,7 +142,7 @@ const EmployerAnnouncements = () => {
       {/* Action buttons */}
       <div className="grid grid-cols-1 gap-3 justify-between px-3 py-1">
         <button
-          className="text-purple-800 text-sm lg:text-medium shadow-lg round-sm border-gray-400 bg-gray-100 border-x-gray-400 px-2 py-1 hover:scale-105 duration:100"
+          className="text-purple-800 text-sm lg:text-medium shadow-xl round-sm  bg-white border-1 bordre-sm border-gray-600 px-2 py-1 hover:scale-105 duration:250"
           onClick={() => setCreateAnnouncement(true)}
         >
           Create Announcement
@@ -318,7 +318,7 @@ const EmployerAnnouncements = () => {
         visibleAnnouncements.map((announcement, index) => (
           <div
             key={announcement.id || index}
-            className="border border-gray-100 shadow-2xl px-3 py-3 bg-[#E2E4F2] text-black w-full my-2 rounded-sm hover:scale-105 duration:300"
+            className="border border-gray-100 shadow-2xl mr-2  px-3 py-3 bg-gray-white text-black w-full my-2 rounded-sm "
           >
             <div className="flex justify-between items-center">
               <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>

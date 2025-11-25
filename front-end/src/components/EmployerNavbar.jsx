@@ -41,7 +41,7 @@ const EmployerNavbar = ({ messageState }) => {
           Message
         </button>
         <Link
-          to={`/onborading/sign-up/team`}
+          to={`/onboarding/sign-up/team`}
           className="text-purple-200 text-xs"
         >
           Team

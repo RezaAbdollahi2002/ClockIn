@@ -31,19 +31,19 @@ const Navbar = ({ messageState }) => {
             to={"/onboarding/sign-up/employee-dashboard"}
             className="text-white mx-2 font-bold text-sm cursor-pointer hover:scale-105 duration:300"
           >
-            Homebase
+            ClockIn
           </Link>
 
           {/* Desktop Schedule Dropdown */}
-          <div className="relative group">
+          <div className="relative group -mt-0.5">
             <button className="text-purple-200 text-xs bg-transparent border-none  cursor-pointer hover:scale-105 duration:300">
               Schedule
             </button>
-            <ul className="absolute top-full left-0 bg-[#35175C] text-white shadow-lg rounded mt-1 w-48 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
+            <ul className="absolute top-full left-0 bg-[#35175C] text-white shadow-lg rounded  w-48 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
               <li>
                 <Link 
                   to={"/onboarding/Schedule"} 
-                  className="block px-2 py-1 hover:bg-purple-700 text-sm"
+                  className="block px-2 py-2 hover:bg-purple-700 text-sm"
                 >
                   Schedule
                 </Link>

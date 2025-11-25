@@ -4,7 +4,7 @@ import Message from "./Message";
 import EmployerAnnouncements from "./EmployerAnnouncements";
 import axios from "axios";
 
-const EmployerDashboard = ({ message }) => {
+const EmployerDashboard = ({ message,setMessage }) => {
 
   const [employerName, setEmployerName] = useState("Employer");
   const [loading, setLoading] = useState(true);
@@ -47,15 +47,14 @@ useEffect(() => {
   
   
   return (
-    <div className="bg-gray-200 min-h-screen p-4 grid- grid-cols-2">
+    <div className="bg-gray-100 border-gray-200 min-h-screen p-4 grid-cols-2">
       <h1 className="text-center font-bold  text-xl md:text-2xl lg:text-3xl my-2">Hello back, {employerName}</h1>
       {/* Main dashboard content */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-10">
-        <div className={`bg-black rounded-xl p-4 shadow col-span-2`}>
-          {/* left panel */}
-          <EmployerAnnouncements />
-          
-        </div>
+          <div className={`bg-white rounded-xl p-4 shadow col-span-2`}>
+            {/* left panel */}
+            <EmployerAnnouncements />
+          </div>
 
           {/* right panel */}
           <div>

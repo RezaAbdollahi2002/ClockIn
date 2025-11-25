@@ -27,29 +27,29 @@ const EmployeeAnnouncement = () => {
   }, [employeeId]);
 
   return (
-    <div className="bg-transparent border border-gray-400 p-4 h-full text-lack">
+    <div className="bg-transparent p-4 h-full text-lack">
       {announcements.length === 0 ? (
-        <p className="text-black">No announcements found</p>
+        <p className="text-red">No announcements found</p>
       ) : (
         <>
-          <ul className="list-none space-y-3 shadow-5xl">
+          <ul className="list-none space-y-3">
             {(moreAnnouncements ? announcements : announcements.slice(0, 2)).map((a, index) => {
               const isExpanded = expandedId === (a.id ?? index);
 
               return (
-                <li key={a.id ?? index} className='px-4 shadow-5xl'>
+                <li key={a.id ?? index}>
 
-                  <div className=" shadow-5xl shadow-black px-10 pt-10 pb-4 hover:border hover:border-[#1a1365] duration-200 bg-gray-100  rounded-sm text-white">
+                  <div className=" shadow-xl px-2 py-1 border-2   rounded-lg text-black bg-white">
                     <div className='flex justify-between'>
-                      <h1 className="text-black font-bold text-xl md:text-xl text-center"><span className='text-black font-bold text-medium md:text-lg'>Subject: {" "}</span>{a.title}</h1>
+                      <h1 className="text-black font-bold text-medium md:text-xl text-center px-1">{a.title}</h1>
 
-                      <button className='text-xs text-gray-400 justify-between' onClick={() => setShowAttachment(!showAttachment)}>Attachment</button>
+                      <button className='text-xs text-gray-800 justify-between' onClick={() => setShowAttachment(!showAttachment)}>Attachment</button>
 
                     </div>
 
-                    <hr className='text-black my-2'/>
+                    <hr className='my-2'/>
                     {isExpanded ? (
-                      <p className="w-full break-words px-2 py-1 text-black text-sm md:text-medium">
+                      <p className="w-full break-words px-2 py-1 text-white">
                         {a.message}
                         <button
                           type="button"
@@ -66,7 +66,7 @@ const EmployeeAnnouncement = () => {
 
                       </p>
                     ) : (
-                      <p className="w-full text-black break-words px-2 py-1 text-sm md:text-medium">
+                      <p className="w-full break-words px-2 py-1">
                         {String(a.message ?? "").slice(0, 30)}
                         <button
                           type="button"
