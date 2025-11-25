@@ -277,32 +277,6 @@ class ShiftEmployeeDashboard(BaseModel):
     description: str
     start_time: datetime
     end_time: datetime
-    
-    
-# ----------- Availabilities -------------
-
-# -------- Base Schema --------
-class AvailabilityBase(BaseModel):
-    employee_id: int = Field(..., description="The employee this availability belongs to")
-    type: models.AvailabilityType = Field(default=models.AvailabilityType.available, description="Type of availability")
-    name: Optional[str] = Field(None, max_length=50, description="Label (Vacation, Class Schedule, etc.)")
-
-    # Date range
-    start_date: date = Field(..., description="Start date of availability")
-    end_date: Optional[date] = Field(None, description="End date of availability (null if one-day)")
-
-    # Recurrence
-    day_of_week: Optional[int] = Field(
-        None, ge=0, le=6, description="Optional recurring day of week (0=Monday, 6=Sunday)"
-    )
-
-    # Time range
-    start_time: Optional[time] = Field(None, description="Start time (null = all day)")
-    end_time: Optional[time] = Field(None, description="End time (null = all day)")
-
-    description: Optional[str] = Field(None, max_length=200, description="Extra notes")
-
-
 # -------- Create Schema --------
 class AvailabilityCreate(AvailabilityBase):
     """Schema for creating new availability"""
@@ -312,15 +286,30 @@ class AvailabilityCreate(AvailabilityBase):
 # -------- Update Schema --------
 class AvailabilityUpdate(BaseModel):
     """Schema for updating an availability"""
-    type: Optional[models.AvailabilityType]
-    name: Optional[str]
-    start_date: Optional[date]
-    end_date: Optional[date]
-    day_of_week: Optional[int]
-    start_time: Optional[time]
-    end_time: Optional[time]
-    description: Optional[str]
-    status: Optional[AvailabilityStatus]
+    employee_id: Optional[int] = None
+    name: Optional[str] = None
+    type: Optional[models.AvailabilityType] = None
+    
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    
+    monday_start: Optional[time] = None
+    monday_end: Optional[time] = None
+    tuesday_start: Optional[time] = None
+    tuesday_end: Optional[time] = None
+    wednesday_start: Optional[time] = None
+    wednesday_end: Optional[time] = None
+    thursday_start: Optional[time] = None
+    thursday_end: Optional[time] = None
+    friday_start: Optional[time] = None
+    friday_end: Optional[time] = None
+    saturday_start: Optional[time] = None
+    saturday_end: Optional[time] = None
+    sunday_start: Optional[time] = None
+    sunday_end: Optional[time] = None
+    
+    description: Optional[str] = None
+    status: Optional[AvailabilityStatus] = None
 
 
 # -------- Response Schema --------
