@@ -76,34 +76,10 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage }) => {
       {/* Calendar + List */}
       <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Left panel: list of shifts */}
-        <div className="md:col-span-1 space-y-2">
-          {shifts.map((shift, index) => {
-            const fullName = `${shift.employee?.firstName} ${shift.employee?.lastName}`.trim();
-
-            return (
-              <div
-                key={shift.id || index}
-                className="border border-gray-300 rounded-md flex items-center gap-3 px-2 py-1 text-gray-800"
-              >
-                {shift.employee?.profilePicture ? (
-                  <img
-                    src={`http://localhost:8000${shift.employee.profilePicture}`}
-                    alt={fullName}
-                    className="w-6 h-6 rounded-full object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                    {shift.employee?.firstName ? shift.employee.firstName[0] : "?"}
-                  </div>
-                )}
-                <div className="truncate">{fullName || "Unnamed Employee"}</div>
-              </div>
-            );
-          })}
-        </div>
+        
 
         {/* Right panel: calendar */}
-        <div className="md:col-span-3">
+        <div className="w-max">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"

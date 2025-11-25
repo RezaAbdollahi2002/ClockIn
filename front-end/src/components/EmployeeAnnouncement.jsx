@@ -29,7 +29,7 @@ const EmployeeAnnouncement = () => {
   return (
     <div className="bg-transparent p-4 h-full text-lack">
       {announcements.length === 0 ? (
-        <p className="text-white">No announcements found</p>
+        <p className="text-red">No announcements found</p>
       ) : (
         <>
           <ul className="list-none space-y-3">
@@ -39,15 +39,15 @@ const EmployeeAnnouncement = () => {
               return (
                 <li key={a.id ?? index}>
 
-                  <div className=" shadow-xl px-2 py-1 hover:scale-95 duration-200 bg-gray-700 rounded-sm text-white">
+                  <div className=" shadow-xl px-2 py-1 border-2   rounded-lg text-black bg-white">
                     <div className='flex justify-between'>
-                      <h1 className="text-white font-bold text-xl md:text-2xl text-center">{a.title}</h1>
+                      <h1 className="text-black font-bold text-medium md:text-xl text-center px-1">{a.title}</h1>
 
-                      <button className='text-xs text-gray-400 justify-between' onClick={() => setShowAttachment(!showAttachment)}>Attachment</button>
+                      <button className='text-xs text-gray-800 justify-between' onClick={() => setShowAttachment(!showAttachment)}>Attachment</button>
 
                     </div>
 
-                    <hr />
+                    <hr className='my-2'/>
                     {isExpanded ? (
                       <p className="w-full break-words px-2 py-1 text-white">
                         {a.message}

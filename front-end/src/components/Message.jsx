@@ -19,6 +19,7 @@ const Message = ({ onClose }) => {
   const [messageText, setMessageText] = useState("");
   const [role, setRole] = useState("");
   const [showImage, setShowImage] = useState(false);
+  const [firstName, setFirstName] = useState(null);
 
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
@@ -41,11 +42,46 @@ const Message = ({ onClose }) => {
       .catch(() => setTeam([]));
   }, [userId]);
 
+  useEffect(() => {
+    const fetchEmployeeInfo = async () => {
+      try {
+        const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
+        setFirstName(res.data.first_name); // assuming API returns { first_name: "..." }
+        console.log("First name: " + firstName);
+      } catch (error) {
+        console.error("Error fetching employee info:", error);
+      }
+    };
+
+    if (userId) {
+      fetchEmployeeInfo();
+    }
+  }, [userId]);
 
   const fetchConversations = async () => {
     const res = await axios.get(`${BASE_URL}conversations/${userId}`);
     setConversations(res.data);
   };
+  const changeConversationName = (firstName) => {
+    setConversations((prevConversations) =>
+      prevConversations.map((conv) => {
+        const parts = conv.name.split(" and "); // ["Reza", "Alex"]
+
+        // if conversation has exactly two names
+        if (parts.length === 2) {
+          if (parts[0] === firstName) {
+            return { ...conv, name: parts[1] }; // return the other one
+          } else if (parts[1] === firstName) {
+            return { ...conv, name: parts[0] };
+          }
+        }
+
+        // if no match or not 2 parts, leave it unchanged
+        return conv;
+      })
+    );
+  };
+
 
   useEffect(() => {
     fetchConversations();
@@ -106,7 +142,7 @@ const Message = ({ onClose }) => {
         id: res.data.message_id,
         sender_id: userId,
         text: text,
-        attachment_url: res.data.attachment_url || null,   
+        attachment_url: res.data.attachment_url || null,
         attachment_type: res.data.attachment_type || null,
         created_at: res.data.created_at || new Date().toISOString(),
       },

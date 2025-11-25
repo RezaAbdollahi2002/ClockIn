@@ -40,10 +40,10 @@ const App = () => {
         <Route path='/onboarding/sign-up/business-info' element={<BusinessInfoOwnerSignUp />} />
         <Route path='/onboarding/sign-up/business-info/create-owner-account' element={<CreateOwnerAccount />} />
         <Route path='/onboarding/sign-up/business-info/finalize-create-owner-account' element={<FinalizeOwnerAccount />} />
-        <Route path='/onboarding/sign-up/employer-dashborad' element={
+        <Route path='/onboarding/sign-up/employer-dashboard' element={
           <>
             <EmployerNavbar messageState={handleMessageState} />
-            <EmployerDashboard message={message} />
+            <EmployerDashboard message={message} setMessage={setMessage} />
           </>
         }
       />
@@ -58,7 +58,6 @@ const App = () => {
           <>
             <Navbar messageState={handleMessageState}/>
             <EmployeeDashboard message={message} setMessage={setMessage} />
-            
           </>
         }
            />

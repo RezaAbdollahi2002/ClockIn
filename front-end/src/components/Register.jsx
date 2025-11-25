@@ -58,7 +58,7 @@ const Register = () => {
       navigate('/onboarding/sign-up/employee-dashboard');
     } else if (data.role === "employer") {
       console.log("EmployerId:" , data.employer_id.toString())
-      navigate('/onboarding/sign-up/employer-dashborad');
+      navigate('/onboarding/sign-up/employer-dashboard');
     } else {
       setError("Unknown user role");
     }
