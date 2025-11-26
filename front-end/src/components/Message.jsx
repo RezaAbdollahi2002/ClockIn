@@ -58,6 +58,8 @@ const Message = ({ onClose }) => {
     }
   }, [userId]);
 
+
+
   const fetchConversations = async () => {
     const res = await axios.get(`${BASE_URL}conversations/${userId}`);
     setConversations(res.data);
@@ -86,6 +88,59 @@ const Message = ({ onClose }) => {
   useEffect(() => {
     fetchConversations();
   }, [userId]);
+
+  // 1. Fetch user info once
+useEffect(() => {
+  const fetchUserInfo = async () => {
+    try {
+      const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
+      const fetchedFirstName = res.data.first_name || "employee";
+      setFirstName(fetchedFirstName);
+      console.log("Fetched first name:", fetchedFirstName);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (userId) fetchUserInfo();
+}, [userId]);
+
+// 2. Fetch & clean conversations
+const fetchConversationsNames = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}conversations/${userId}`);
+    let data = res.data;
+
+    // Clean names right here using firstName
+    if (firstName) {
+      data = data.map(conv => {
+        if (conv.name && conv.name.includes(" and ")) {
+          const splitName = conv.name.split(" and ");
+          return {
+            ...conv,
+            name: splitName[0] === firstName ? splitName[1] : splitName[0],
+          };
+        }
+        return conv;
+      });
+    }
+
+    setConversations(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// 3. Load conversations when userId OR firstName is ready
+useEffect(() => {
+  if (userId && firstName) {
+    fetchConversationsNames();
+  }
+}, [userId, firstName,conversations]);
+
+  
+
+
 
   // Cleanup WebSocket on unmount
   useEffect(() => {
@@ -203,6 +258,19 @@ const Message = ({ onClose }) => {
     }
   };
 
+  const conversationNameConvertor = async ({ conv, userId }) => {
+    try {
+      const resp = await axios.get(`/api/employees/settings/${userId}/employee-info`).then((res) => setFirstName(res.data.first_name)).catch((err) => console.error(err));
+      console.log("first_name: " + firstName)
+    } catch (err) {
+      console.error(err);
+    }
+    const name = conv.name
+    if (firstName in name) {
+
+    }
+  }
+
 
 
 
@@ -229,22 +297,26 @@ const Message = ({ onClose }) => {
                 </button>
 
               </div>
-
+              {/* Conversations finder  */}
               <h2 className="font-bold mb-2 text-center mt-2 text-lg lg:text-xl">Conversations</h2>
               <ul className="flex-1 overflow-y-auto ">
-                {conversations.map((conv) => (
-                  <li
-                    key={conv.id}
-                    className="cursor-pointer bg-[#542B6F] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
-                    onClick={() => openConversation(conv)}
-                  >
-                    <div className="flex justify-between">
-                      <span>{conv.name}</span>
-                      <span className="text-xs text-gray-400">
-                        {new Date(conv.last_message_at).toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </li>
+                {conversations.map((conv, index) => (
+                  <div >
+                    {() => conversationNameConvertor(conv, userId)}
+                    <li
+                      key={index}
+                      className="cursor-pointer bg-[#062D5B] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
+                      onClick={() => openConversation(conv)}
+                    >
+                      <div className="flex justify-between">
+                        <span>{conv.name}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(conv.last_message_at).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </li>
+                  </div>
+
                 ))}
               </ul>
               <button

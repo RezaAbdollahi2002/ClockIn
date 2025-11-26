@@ -6,6 +6,10 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Typewriter } from 'react-simple-typewriter';
+import resourcePlugin from '@fullcalendar/resource';
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+
 
 const EmployerSchedule = () => {
   const [shifts, setShifts] = useState([]);
@@ -34,9 +38,10 @@ const EmployerSchedule = () => {
   const [published, setPublished] = useState(true);
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0, shiftId: null });
   const [moreDetail, setMoreDetail] = useState(false);
-  
- 
-  
+  const [currentView, setCurrentView] = useState("resourceTimeGridWeek");
+
+
+
 
 
 
@@ -45,14 +50,14 @@ const EmployerSchedule = () => {
 
   useEffect(() => {
     // Fetch shifts with employee info
-    axios.get("http://localhost:8000/shifts/employer", {params: {"employer_id": employerId,"published": published }})
-      .then(res => { 
-        setShifts(res.data); 
-        setLoading(false); 
+    axios.get("http://localhost:8000/shifts/employer", { params: { "employer_id": employerId, "published": published } })
+      .then(res => {
+        setShifts(res.data);
+        setLoading(false);
       })
-      .catch(err => { 
-        setError(err.response?.data?.detail || "Failed to load shifts"); 
-        setLoading(false); 
+      .catch(err => {
+        setError(err.response?.data?.detail || "Failed to load shifts");
+        setLoading(false);
       });
 
     // Fetch team members
@@ -60,33 +65,39 @@ const EmployerSchedule = () => {
       .then(res => {
         setTeamMembers(res.data);
       }
-    )
+      )
       .catch(err => console.error("Failed to fetch team members:", err));
   }, [employerId]);
 
   const filteredMembers = teamMembers.filter(member =>
     member.first_name.toLowerCase().includes(search.toLowerCase())
   );
-  
- const handleContextMenu = (e, shiftId) => {
-  e.preventDefault();
-  setMenu({
-    visible: true,
-    x: e.pageX,
-    y: e.pageY,
-    shiftId,
-  });
-};
+  const resources = teamMembers.map(member => ({
+    id: member.id.toString(),
+    title: member.first_name + " " + member.last_name,
+  }));
 
-const handleClickOutside = () => {
-  if (menu.visible) setMenu({ ...menu, visible: false });
-};
+
+  const handleContextMenu = (e, shiftId) => {
+    e.preventDefault();
+    setMenu({
+      visible: true,
+      x: e.pageX,
+      y: e.pageY,
+      shiftId,
+    });
+  };
+
+  const handleClickOutside = () => {
+    if (menu.visible) setMenu({ ...menu, visible: false });
+  };
 
   const events = shifts.map((shift) => ({
     id: shift.id,
     title: `${shift.role} - ${shift.title} @ ${shift.location || "No location"}`,
     role: shift.role,
-    location : shift.location,
+    location: shift.location,
+    resourceId: shift.employee_id.toString(),   // 👈 match with resources
     start: new Date(shift.start_time),
     end: new Date(shift.end_time),
     backgroundColor: shift.role === "Supervisor" ? "yellow" : "#6e2a3c",
@@ -98,18 +109,18 @@ const handleClickOutside = () => {
       profilePicture: shift.employee?.profile_picture || null,
       employeeName: shift.employee?.first_name || "",
     },
-    
+
   }));
-  
+
   const handleCreateShift = () => {
     if (!selectedMember || !role || !location || !publishStatus || !title || !startTime || !endTime) {
-  console.log({ selectedMember, role, location, publishStatus, title, startTime, endTime, status });
-  alert("Please fill all fields and select a member!");
-  return;
-}
+      console.log({ selectedMember, role, location, publishStatus, title, startTime, endTime, status });
+      alert("Please fill all fields and select a member!");
+      return;
+    }
 
     const employerIdNum = Number(employerId);
-    
+
     const formatDateTime = (dt) => {
       if (!dt) return null;
       if (dt.length === 16) return dt + ":00";
@@ -129,12 +140,14 @@ const handleClickOutside = () => {
       end_time: formatDateTime(endTime),
     };
     console.log(payload)
-    
+
 
     axios.post("http://localhost:8000/shifts", payload)
       .then(res => {
         alert("Shift created successfully!");
-        setShifts(prev => [...prev, res.data]);
+        setShifts(prev =>
+          prev.map(s => (s.id === res.data.id ? res.data : s))
+        );
         setSelectedMember(null);
         setRole(""); setLocation(""); setPublishStatus("");
         setTitle(""); setDescription(""); setStartTime(""); setEndTime("");
@@ -144,26 +157,26 @@ const handleClickOutside = () => {
         alert("Failed to create shift!");
       });
   };
-    const handleEdit = () => {
-        if (editShiftId == null || editEmployeeId == null ){
-          alert("Please fill out shift_id and ")
-        }
-        const editEmployeeIDNumber = Number(editEmployeeId);
-    
+  const handleEdit = () => {
+    if (editShiftId == null || editEmployeeId == null) {
+      alert("Please fill out shift_id and ")
+    }
+    const editEmployeeIDNumber = Number(editEmployeeId);
+
     const formatDateTime = (dt) => {
       if (!dt) return null;
       if (dt.length === 16) return dt + ":00";
       return dt;
     };
     const payload = {
-      employee_id : editEmployeeIDNumber,
+      employee_id: editEmployeeIDNumber,
       title: editTitle,
       start_time: formatDateTime(editStartTime),
       end_time: formatDateTime(editEndTime),
     };
     console.log(payload)
 
-    axios.put(`http://localhost:8000/shifts/${editShiftId}/edit`, null, {params: payload})
+    axios.put(`http://localhost:8000/shifts/${editShiftId}/edit`, null, { params: payload })
       .then(res => {
         alert("Shift updated successfully!");
         setShifts(prev => [...prev, res.data]);
@@ -177,7 +190,7 @@ const handleClickOutside = () => {
         console.error("Backend error:", err.response?.data || err.message);
         alert("Failed to update shift!");
       });
-      }
+  }
 
 
   const handleRemoveShift = (shiftId) => {
@@ -209,7 +222,7 @@ const handleClickOutside = () => {
           <li className="hover:scale-105 hover:font-bold duration-75" onClick={() => setPublished(true)}>Published Shifts</li>
           <li className="hover:scale-105 hover:font-bold duration-75" onClick={() => setPublished(false)}>Unpublished Shifts</li>
         </ul>
-      </div> 
+      </div>
 
 
 
@@ -286,64 +299,64 @@ const handleClickOutside = () => {
             <div className="max-h-60 overflow-y-auto text-sm">
               {shifts.map((shift) => (
                 <div
-                        key={shift.id}
-                        className="border border-gray-400 text-xs lg:text-sm font-semibold rounded-sm px-2 py-2 flex flex-col hover:shadow-lg hover:scale-[1.01] duration-200"
-                      >
-                        <div className="flex justify-between text-black">
-                          <span>
-                            {shift.employee?.first_name} {shift.employee?.last_name}
-                          </span>
-                          <span>
-                            {new Date(shift.start_time).toLocaleString()} →{" "}
-                            {new Date(shift.end_time).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="text-gray-600">
-                          {shift.role} — {shift.title} @ {shift.location}
-                        </div>
-                        <div className="mt-2 flex gap-2">
-                          <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" onClick={() => {
-                            setIsHandleEdit(!isHandleEdit);
-                            setEditShiftId(shift.id);
-                            setEditEmployeeId(shift.employee_id);
+                  key={shift.id}
+                  className="border border-gray-400 text-xs lg:text-sm font-semibold rounded-sm px-2 py-2 flex flex-col hover:shadow-lg hover:scale-[1.01] duration-200"
+                >
+                  <div className="flex justify-between text-black">
+                    <span>
+                      {shift.employee?.first_name} {shift.employee?.last_name}
+                    </span>
+                    <span>
+                      {new Date(shift.start_time).toLocaleString()} →{" "}
+                      {new Date(shift.end_time).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="text-gray-600">
+                    {shift.role} — {shift.title} @ {shift.location}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" onClick={() => {
+                      setIsHandleEdit(!isHandleEdit);
+                      setEditShiftId(shift.id);
+                      setEditEmployeeId(shift.employee_id);
 
-                          }}>
-                            Edit
-                          </button>
-                          <button
-                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                            onClick={() => handleRemoveShift(shift.id)}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    }}>
+                      Edit
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      onClick={() => handleRemoveShift(shift.id)}
+                    >
+                      Remove
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-gray-500">No shifts available</p>
-                )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No shifts available</p>
+          )}
+        </div>
+      )}
+      {
+        isHandleEdit && (
+          <>
+            <div className="border border-gray-400 rounded-sm px-4 py-2 grid grid-cols-1 md:grid-cols-2 max-w-[500px] mx-auto shadow-3xl" >
+              <input className="text-xs lg:text-sm px-1 focus:outline-none focus:border-transparent focus:ring-0 mb-2" type="text" placeholder="title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+              <div className="flex flex-col ">
+                <p className="text-xs lg:text-sm font-semibold ">Start time</p>
+                <input className="mb-2" type="datetime-local" placeholder="start time" value={editStartTime} onChange={(e) => setEditStartTime(e.target.value)} />
               </div>
-            )}
-            {
-              isHandleEdit && (
-                <>
-                  <div className="border border-gray-400 rounded-sm px-4 py-2 grid grid-cols-1 md:grid-cols-2 max-w-[500px] mx-auto shadow-3xl" >
-                    <input className="text-xs lg:text-sm px-1 focus:outline-none focus:border-transparent focus:ring-0 mb-2"  type="text" placeholder="title" value={editTitle} onChange={(e) => setEditTitle(e.target.value)}/>
-                    <div className="flex flex-col ">
-                      <p className="text-xs lg:text-sm font-semibold ">Start time</p>
-                      <input className="mb-2" type="datetime-local" placeholder="start time" value={editStartTime} onChange={(e) => setEditStartTime(e.target.value)}/>
-                    </div>
-                    <div className="flex flex-col ">
-                        <p className="text-xs lg:text-sm font-semibold ">End time</p>
-                        <input type="datetime-local" placeholder="end time"  value={editEndTime} onChange={(e) => setEditEndTime(e.target.value)}/>
-                    </div>
-                    
-                    <button type="button" className="px-2 py-1 rounded-sm text-white bg-purple-700" onClick={handleEdit}>Edit</button>
-                  </div>
-                </>
-              )
-            }
+              <div className="flex flex-col ">
+                <p className="text-xs lg:text-sm font-semibold ">End time</p>
+                <input type="datetime-local" placeholder="end time" value={editEndTime} onChange={(e) => setEditEndTime(e.target.value)} />
+              </div>
+
+              <button type="button" className="px-2 py-1 rounded-sm text-white bg-purple-700" onClick={handleEdit}>Edit</button>
+            </div>
+          </>
+        )
+      }
 
 
       {/* Remove Shift */}
@@ -369,93 +382,102 @@ const handleClickOutside = () => {
       {
         published && (
           <>
-          <h1 className="text-center my-5 text-lg md:text-2xl xl:text:3xl font-bold text-[#292424]">  
-            <Typewriter 
-            words ={['Published Schedule']}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={70}
-            deleteSpeed={50}
-            delaySpeed={1000}
-          />
-          </h1>
-          
+            <h1 className="text-center my-5 text-lg md:text-2xl xl:text:3xl font-bold text-[#292424]">
+              <Typewriter
+                words={['Published Schedule']}
+                loop={true}
+                cursor
+                cursorStyle="|"
+                typeSpeed={70}
+                deleteSpeed={50}
+                delaySpeed={1000}
+              />
+            </h1>
+
             <div className="p-4">
               <FullCalendar
-                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                  initialView="timeGridWeek"
-                  events={events}
-                  height="auto"
-                  headerToolbar={{
+                plugins={[resourcePlugin,
+                  resourceTimeGridPlugin,
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  ,
+                  interactionPlugin]}
+                initialView="resourceTimeGridWeek"
+                resources={resources}
+                events={events}
+                resourceAreaHeaderContent="Employees"  // left column title
+                resourceAreaWidth="220px"              // adjust width as needed           
+                height="auto"
+                slotEventOverlap={false}
+                headerToolbar={{
                   left: "prev,next today",
                   center: "title",
-                  right: "dayGridMonth,timeGridWeek,timeGridDay"
+                  right: 'resourceTimeGridDay,resourceTimeGridWeek'
                 }}
-                  eventContent={(arg) => {
-                    const { role, title, location, profilePicture, employeeName } = arg.event.extendedProps;
+                eventContent={(arg) => {
+                  const { role, title, location, profilePicture, employeeName } = arg.event.extendedProps;
 
-                    return (
-                      <div 
+                  return (
+                    <div
                       onContextMenu={handleContextMenu}
                       onClick={
-                        () => {setMoreDetail(!moreDetail)}
+                        () => { setMoreDetail(!moreDetail) }
 
-                      } 
+                      }
                       className="lg:flex items-start gap-2 px-1 py-3 rounded-lg  text-white text-xs md:text-sm font-semibold text-center justify-center
                        w-full h-full  border shadow-2xl hover:scale-106 duration-200 hover:bg-[#b62f52] ">
-                        {/* Profile Picture or Initial */}
-                        {profilePicture ? (
-                          <>
+                      {/* Profile Picture or Initial */}
+                      {profilePicture ? (
+                        <>
                           {
-                              moreDetail && (
-                                <>
-                                  <div className="hidden lg:block flex bg-white text-black font-bold  mt-4 px-2 py-1 ">
-                                      <span className="hidden lg:block text-xs">{role} - {title}</span>
-                                      {location && <span className="text-xs hidden lg:block md:text-sm">{location}</span>}
-                                  </div>
-                                </>
-                              )
+                            moreDetail && (
+                              <>
+                                <div className="hidden lg:block flex bg-white text-black font-bold  mt-4 px-2 py-1 ">
+                                  <span className="hidden lg:block text-xs">{role} - {title}</span>
+                                  {location && <span className="text-xs hidden lg:block md:text-sm">{location}</span>}
+                                </div>
+                              </>
+                            )
                           }
-                            <div className="flex gap-5 lg:justify-start lg:justify-start hidden lg:block">
-                                   <img
-                                    src={`http://localhost:8000${profilePicture}`}
-                                    alt={employeeName}
-                                    className="w-5 h-5  lg:w-5 lg:h-5  rounded-full object-cover flex-shrink-0"
-                                  />
-                                  
-                            </div>
-                          </>
-                        ) : (
-                          <div className="w-2 h-2 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                            {employeeName ? employeeName[0] : "?"}
-                          </div>
-                        )}
-                        {menu.visible && (
-                          <ul
-                            className="absolute bg-white border rounded shadow-md z-50"
-                            style={{ top: menu.y, left: menu.x }}
-                          >
-                            <li
-                              onClick={() => {
-                                handleRemoveShift(menu.shiftId);
-                                handleClickOutside();
-                              }}
-                              className="px-4 py-2 hover:bg-red-100 text-red-600 cursor-pointer"
-                            >
-                              Remove Shift
-                            </li>
-                          </ul>
-                        )}
+                          <div className="flex gap-5 lg:justify-start lg:justify-start hidden lg:block">
+                            <img
+                              src={`http://localhost:8000${profilePicture}`}
+                              alt={employeeName}
+                              className="w-5 h-5  lg:w-5 lg:h-5  rounded-full object-cover flex-shrink-0"
+                            />
 
-                        {/* Shift Info */}
-                        <div className="grid grid-cols-1 -mt-2 md:ml-1 text-center break-words text-xs md:text-sm ">
-                          <span className="font-bold mt-2 text-xs ">{employeeName || "employee"}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                          {employeeName ? employeeName[0] : "?"}
                         </div>
+                      )}
+                      {menu.visible && (
+                        <ul
+                          className="absolute bg-white border rounded shadow-md z-50"
+                          style={{ top: menu.y, left: menu.x }}
+                        >
+                          <li
+                            onClick={() => {
+                              handleRemoveShift(menu.shiftId);
+                              handleClickOutside();
+                            }}
+                            className="px-4 py-2 hover:bg-red-100 text-red-600 cursor-pointer"
+                          >
+                            Remove Shift
+                          </li>
+                        </ul>
+                      )}
+
+                      {/* Shift Info */}
+                      <div className="grid grid-cols-1 -mt-2 md:ml-1 text-center break-words text-xs md:text-sm ">
+                        <span className="font-bold mt-2 text-xs ">{employeeName || "employee"}</span>
                       </div>
-                    );
-                  }}
-                  />
+                    </div>
+                  );
+                }}
+              />
             </div>
           </>
         )
@@ -463,62 +485,63 @@ const handleClickOutside = () => {
       {
         !published && (
           <>
-          <h1 className="text-center my-5 text-lg md:text-2xl xl:text:3xl font-bold text-[#292424]">  
-            <Typewriter 
-            words ={['Unpublished Schedule']}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={70}
-            deleteSpeed={50}
-            delaySpeed={1000}
-          />
-          </h1>
-          
+            <h1 className="text-center my-5 text-lg md:text-2xl xl:text:3xl font-bold text-[#292424]">
+              <Typewriter
+                words={['Unpublished Schedule']}
+                loop={true}
+                cursor
+                cursorStyle="|"
+                typeSpeed={70}
+                deleteSpeed={50}
+                delaySpeed={1000}
+              />
+            </h1>
+
             <div className="p-4">
               <FullCalendar
-                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                  initialView="timeGridWeek"
-                  events={events}
-                  height="auto"
-                  headerToolbar={{
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                events={events}
+                height="auto"
+                slotEventOverlap={false}
+                headerToolbar={{
                   left: "prev,next today",
                   center: "title",
                   right: "dayGridMonth,timeGridWeek,timeGridDay"
                 }}
-                  eventContent={(arg) => {
-                    const { role, title, location, profilePicture, employeeName } = arg.event.extendedProps;
+                eventContent={(arg) => {
+                  const { role, title, location, profilePicture, employeeName } = arg.event.extendedProps;
 
-                    return (
-                      <div className="lg:flex items-start gap-2 px-1 py-3 rounded-lg  text-white text-xs md:text-sm font-semibold text-center justify-center w-full h-full  border shadow-2xl hover:scale-106 duration-200 hover:bg-[#b62f52]">
-                        {/* Profile Picture or Initial */}
-                        {profilePicture ? (
-                          <>
-                            <div className="flex gap-5 justify-center lg:justify-start">
-                                   <img
-                                    src={`http://localhost:8000${profilePicture}`}
-                                    alt={employeeName}
-                                    className="w-6 h-6  md:w-10 md:h-10  rounded-full object-cover flex-shrink-0"
-                                  />
-                                  
-                            </div>
-                          </>
-                        ) : (
-                          <div className="w-2 h-2 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                            {employeeName ? employeeName[0] : "?"}
+                  return (
+                    <div className="lg:flex items-start gap-2 px-1 py-3 rounded-lg  text-white text-xs md:text-sm font-semibold text-center justify-center w-full h-full  border shadow-2xl hover:scale-106 duration-200 hover:bg-[#b62f52]">
+                      {/* Profile Picture or Initial */}
+                      {profilePicture ? (
+                        <>
+                          <div className="flex gap-5 justify-center lg:justify-start">
+                            <img
+                              src={`http://localhost:8000${profilePicture}`}
+                              alt={employeeName}
+                              className="w-6 h-6  md:w-10 md:h-10  rounded-full object-cover flex-shrink-0"
+                            />
+
                           </div>
-                        )}
-
-                        {/* Shift Info */}
-                        <div className="grid grid-cols-1 gap-y-2 md:ml-2 text-center break-words text-xs md:text-sm ">
-                          <span className="font-bold mt-2">{employeeName || "employee"}</span>
-                          <span className="hidden md:block">{role} - {title}</span>
-                          {location && <span className="text-xs md:text-sm">{location}</span>}
+                        </>
+                      ) : (
+                        <div className="w-2 h-2 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                          {employeeName ? employeeName[0] : "?"}
                         </div>
+                      )}
+
+                      {/* Shift Info */}
+                      <div className="grid grid-cols-1 gap-y-2 md:ml-2 text-center break-words text-xs md:text-sm ">
+                        <span className="font-bold mt-2">{employeeName || "employee"}</span>
+                        <span className="hidden md:block">{role} - {title}</span>
+                        {location && <span className="text-xs md:text-sm">{location}</span>}
                       </div>
-                    );
-                  }}
-                  />
+                    </div>
+                  );
+                }}
+              />
             </div>
           </>
         )

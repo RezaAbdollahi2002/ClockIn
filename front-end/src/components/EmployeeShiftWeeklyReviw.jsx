@@ -9,7 +9,7 @@ const WeeklyReview = ({ employeeId }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [timeOffRequest, setTimeOffRequest] = useState(null)
+  const [timeOffRequest, setTimeOffRequest] = useState(null);
 
   // Calculate start of week (Monday = 1, Sunday = 0)
   const getWeekStart = (date) => {
@@ -46,9 +46,10 @@ const WeeklyReview = ({ employeeId }) => {
   }, [selectedDate, employeeId]);
 
   return (
-    <div className="flex flex-col gap-y-8 ">
+    <div className="flex flex-col gap-y-8">
+      {/* Weekly summary card */}
       <div className="p-4 rounded-lg shadow-xl shadow-gray-300 bg-white w-full max-w-full border-2">
-        <h2 className="text-lg font-bold mb-4">Your Week</h2>
+        <h2 className="text-lg font-bold mb-4 text-[#0f0c45]">Your Week</h2>
 
         {/* Date Picker */}
         <div className="mb-4">
@@ -57,7 +58,7 @@ const WeeklyReview = ({ employeeId }) => {
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
             dateFormat="MM/dd/yyyy"
-            className="border rounded p-2 hover:border-purple-800 hover:border-2 hover:font-semibold  hover:scale:90 duration:800 "
+            className="border rounded p-2 hover:border-purple-800 hover:border-2 hover:font-semibold hover:scale-95 duration-300"
           />
         </div>
 
@@ -67,45 +68,50 @@ const WeeklyReview = ({ employeeId }) => {
         {data && !loading && !error && (
           <div className="space-y-2">
             <p className="flex gap-1">
-              <strong>Scheduled Hours:</strong>{" "}
-              <p className="text-blue-800 hover:text-purple-800 hover:font-semibold">{data.scheduled_hours?.toFixed(2) ?? "0.00"}</p>
+              <strong>Scheduled Hours:</strong>
+              <span className="text-blue-800 hover:text-purple-800 hover:font-semibold">
+                {data.scheduled_hours?.toFixed(2) ?? "0.00"}
+              </span>
             </p>
             <p>
               vs {data.last_week_hours?.toFixed(2) ?? "0.00"} last week
             </p>
             <p className="flex gap-1">
               <strong>Scheduled Est. Wages:</strong> $
-              <p className="text-blue-800 hover:text-purple-800 hover:font-semibold">{data.scheduled_wages?.toFixed(2) ?? "0.00"}</p>
+              <span className="text-blue-800 hover:text-purple-800 hover:font-semibold">
+                {data.scheduled_wages?.toFixed(2) ?? "0.00"}
+              </span>
             </p>
             <p>
               vs ${data.last_week_wages?.toFixed(2) ?? "0.00"} last week
             </p>
           </div>
         )}
-
       </div>
+
+      {/* Time off card */}
       <div className="p-4 rounded-lg shadow-xl shadow-gray-300 bg-white w-full max-w-full flex flex-col border-2">
-        <p className="text-black font-semibold">Upcoming Time Off</p>
+        <p className="text-[#0f0c45] font-semibold">Upcoming Time Off</p>
+
         <div className="items-center mx-auto mt-4">
-          {
-            timeOffRequest ? (
-              <>
-                <p>T</p>
-              </>
-            ) : (
-              <>
-                <p className="text-purple-600">No time off request</p>
-              </>
-            )
-          }
+          {timeOffRequest ? (
+            <>
+              <p>T</p>
+            </>
+          ) : (
+            <>
+              <p className="text-purple-600">No time off request</p>
+            </>
+          )}
         </div>
 
         <div className="items-center mx-auto mt-4">
-          <button className="bg-purple-700 text-white px-2 py-1 max-w-[250px]  font-semibold text-xs lg:text-sm rounded-md hover:text-white hover:bg-blue-600 hover:font-semibold duration:300">Request Time Off</button>
+          <button className="bg-purple-700 text-white px-2 py-1 max-w-[250px] font-semibold text-xs lg:text-sm rounded-md hover:text-white hover:bg-blue-600 hover:font-semibold duration-300">
+            Request Time Off
+          </button>
         </div>
       </div>
     </div>
-
   );
 };
 

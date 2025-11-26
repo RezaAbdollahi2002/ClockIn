@@ -20,7 +20,7 @@ const EmployerNavbar = ({ messageState }) => {
   };
 
   return (
-    <div className="flex px-2 bg-purple-950 w-full py-2 items-center justify-between">
+    <div className="flex px-2 bg-[#1a1365] w-full py-2 items-center justify-between">
       <ul className="flex gap-3 items-center">
         <Link
           to={"/onboarding/sign-up/employer-dashboard"}

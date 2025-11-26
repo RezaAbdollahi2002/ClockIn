@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Register_image_homepage from '../images/register_homebase_images.png';
+import LogoImage from "../images/LogoClockIn.png";
 import { EnvelopeIcon, LockClosedIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -74,17 +75,16 @@ const Register = () => {
   return (
     <div className="grid grid-cols-1 min-h-screen md:grid-cols-2 bg-gradient-to-br from-[#2B0D59] via-[#5E1FBF] to-[#D473FF]">
       {/* Left */}
-      <div className="flex flex-col justify-between px-6 py-10">
-        <h1 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white mb-4">homebase</h1>
+      <div className="flex flex-col justify-between px-6 py-10 gap-y-15">
+        <h1 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-white mb-4">ClockIn</h1>
         <div className="flex justify-center items-center">
           <img
-            src={Register_image_homepage}
-            alt="register_image"
-            className="max-w-[90%] md:max-w-[500px] h-auto drop-shadow-xl"
+            src={LogoImage}
+            className="max-w-[90%] md:max-w-[500px] h-auto drop-shadow-xl bg-transparent"
           />
         </div>
 
-        <div className="mb-15">
+        <div className="mb-15 md:my-15">
           <h1 className="font-semibold text-lg md:text-xl lg:text-2xl xl:text-3xl text-white mb-3">AI Assistants are here.</h1>
           <p className="text-white wrap-normal leading-relaxed text-base md:text-lg">
             Fast, reliable, and built to save you more time than ever. Seriously lighten your workload with new Hiring

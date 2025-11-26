@@ -164,7 +164,8 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
     if type == "direct":
         if len(participants) != 2:
             raise HTTPException(status_code=400, detail="Direct chat needs 2 participants")
-        name = db.query(Employee).filter(Employee.id == participants[1]).first().first_name + " and " + db.query(Employee).filter(Employee.id == participants[0]).first().first_name
+        name[0] = db.query(Employee).filter(Employee.id == participants[1]).first().first_name
+        name[1] = db.query(Employee).filter(Employee.id == participants[0]).first().first_name
         conv = Conversation(type="direct", name=name)
         db.add(conv)
         db.commit()
