@@ -74,7 +74,7 @@ def get_employee_announcements(employee_id: int, db: Session = Depends(get_db)):
     announcements = (
         db.query(models.Announcement)
         .filter(models.Announcement.employer_id == employee.employer_id)
-        .order_by(models.Announcement.created_at.desc())
+        .order_by(models.Announcement.created_at.asc())
         .all()
     )
 

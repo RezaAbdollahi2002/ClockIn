@@ -19,7 +19,7 @@ const EmployerAnnouncements = () => {
   const [attachment, setAttachment] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [showAll, setShowAll] = useState(false);
-  const [announcementId, setAnnouncementId] = useState(null); 
+  const [announcementId, setAnnouncementId] = useState(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -35,6 +35,7 @@ const EmployerAnnouncements = () => {
           params: { employer_id: employerId },
         });
         setAnnouncements(res.data);
+        console.log(res.data)
       } catch (err) {
         console.error("Error fetching announcements:", err);
       }
@@ -137,12 +138,12 @@ const EmployerAnnouncements = () => {
 
   return (
     <div className="text-black mt-5">
-      <h1 className="text-lg md:text-xl lg:text-2xl font-bold mx-2 my-2">Announcement</h1>
 
       {/* Action buttons */}
-      <div className="grid grid-cols-1 gap-3 justify-between px-3 py-1">
+      <div className="flex justify-center gap-x-2 align-top text-center ">
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold  ">Announcement</h1>
         <button
-          className="text-purple-800 text-sm lg:text-medium shadow-xl round-sm  bg-white border-1 bordre-sm border-gray-600 px-2 py-1 hover:scale-105 duration:250"
+          className="text-black  text-sm bg-gray-300 px-2 rounded-sm"
           onClick={() => setCreateAnnouncement(true)}
         >
           Create Announcement
@@ -318,12 +319,12 @@ const EmployerAnnouncements = () => {
         visibleAnnouncements.map((announcement, index) => (
           <div
             key={announcement.id || index}
-            className="border border-gray-100 shadow-2xl mr-2  px-3 py-3 bg-gray-white text-black w-full my-2 rounded-sm "
+            className="border shadow-2xl mr-2  px-3 py-3 bg-gray-white text-black w-full my-2 rounded-sm "
           >
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between alignment items-center">
               <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>
-              <div className="flex gap-2">
-                <p>{announcement.created_at?.split("T")[0]}</p>
+              <div className="flex gap-2 align-middle">
+                <p className="font-bold text-sm md:text-medium ">{announcement.created_at?.split("T")[0]}</p>
                 <button
                   className="text-black border border-gray-400 px-2 py-1 shadow-sm hover:text-white hover:bg-blue-200 hover:scale-105 text-xs"
                   onClick={() => handleEdit(announcement)}
@@ -331,7 +332,7 @@ const EmployerAnnouncements = () => {
                   Edit
                 </button>
                 <button
-                  className="bg-red-500 text-black hover:text-white hover:scale-105 duration-300 px-2 py-1 text-xs"
+                  className="bg-red-600 text-white hover:text-black hover:bg-red-500  px-2 py-1 text-xs"
                   onClick={() => handleDelete(announcement)}
                 >
                   Remove
@@ -354,6 +355,18 @@ const EmployerAnnouncements = () => {
               </p>
             )}
             <p className="text-left text-red-500 text-xs lg:text-sm px-2">{announcement.expires_at}</p>
+            <div className="flex items-center gap-2">
+              📄
+              <a
+                href={`http://127.0.0.1:8000/${announcement.attachment_url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                {announcement.attachment_url.split("/").pop()}
+              </a>
+            </div>
+
           </div>
         ))}
 
