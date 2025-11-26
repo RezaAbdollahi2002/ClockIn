@@ -187,7 +187,6 @@ class Shift(Base):
 
 # --------------- Availabilities ----------
 
-# Enum (to keep consistency with SQLAlchemy)
 class AvailabilityType(str, enum.Enum):
     available = "available"
     unavailable = "unavailable"
@@ -211,7 +210,7 @@ class EmployeeAvailability(Base):
 
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=True)
-    # Each day has start & end columns
+
     monday_start = Column(Time, nullable=True)
     monday_end   = Column(Time, nullable=True)
     tuesday_start = Column(Time, nullable=True)

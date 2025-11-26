@@ -10,6 +10,8 @@ import schemas
 
 router = APIRouter(prefix="/availabilities", tags=["Availabilities"])
 
+# -------------------- Availability -------------------- #
+
 @router.post("/create", response_model=schemas.AvailabilityRead)
 def create_availability(request: schemas.AvailabilityCreate, db: Session = Depends(get_db)):
     """Create a new employee availability"""

@@ -224,15 +224,38 @@ class AvailabilityBase(BaseModel):
     sunday_end: Optional[time] = None
 
     description: Optional[str] = None
-    status: AvailabilityStatus = AvailabilityStatus.pending
+
 class AvailabilityCreate(AvailabilityBase):
-    pass  # same fields as base for now
+    pass
 
 class AvailabilityRead(AvailabilityBase):
     id: int
+    status: str = "pending"
 
-    class Config:
-        orm_mode = True  # ✅ allows SQLAlchemy models to be returned directly
+    model_config = dict(from_attributes=True)
+
+class AvailabilityUpdate(BaseModel):
+    employee_id: Optional[int] = None
+    name: Optional[str] = None
+    type: Optional[models.AvailabilityType] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    monday_start: Optional[time] = None
+    monday_end: Optional[time] = None
+    tuesday_start: Optional[time] = None
+    tuesday_end: Optional[time] = None
+    wednesday_start: Optional[time] = None
+    wednesday_end: Optional[time] = None
+    thursday_start: Optional[time] = None
+    thursday_end: Optional[time] = None
+    friday_start: Optional[time] = None
+    friday_end: Optional[time] = None
+    saturday_start: Optional[time] = None
+    saturday_end: Optional[time] = None
+    sunday_start: Optional[time] = None
+    sunday_end: Optional[time] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
 # ---------------- shifts ----------
 class ShiftOut(BaseModel):
     id: int
@@ -277,49 +300,6 @@ class ShiftEmployeeDashboard(BaseModel):
     description: str
     start_time: datetime
     end_time: datetime
-# -------- Create Schema --------
-class AvailabilityCreate(AvailabilityBase):
-    """Schema for creating new availability"""
-    pass
-
-
-# -------- Update Schema --------
-class AvailabilityUpdate(BaseModel):
-    """Schema for updating an availability"""
-    employee_id: Optional[int] = None
-    name: Optional[str] = None
-    type: Optional[models.AvailabilityType] = None
-    
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    
-    monday_start: Optional[time] = None
-    monday_end: Optional[time] = None
-    tuesday_start: Optional[time] = None
-    tuesday_end: Optional[time] = None
-    wednesday_start: Optional[time] = None
-    wednesday_end: Optional[time] = None
-    thursday_start: Optional[time] = None
-    thursday_end: Optional[time] = None
-    friday_start: Optional[time] = None
-    friday_end: Optional[time] = None
-    saturday_start: Optional[time] = None
-    saturday_end: Optional[time] = None
-    sunday_start: Optional[time] = None
-    sunday_end: Optional[time] = None
-    
-    description: Optional[str] = None
-    status: Optional[AvailabilityStatus] = None
-
-
-# -------- Response Schema --------
-class AvailabilityResponse(AvailabilityBase):
-    """Schema for returning availability with DB fields"""
-    id: int
-    status: AvailabilityStatus = AvailabilityStatus.pending
-
-    model_config = dict(from_attributes=True) 
-
 
 # ----------------------- Announcements -----------------
 class AnnouncementCreate(BaseModel):
