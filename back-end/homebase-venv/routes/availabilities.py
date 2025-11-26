@@ -74,6 +74,8 @@ def update_availability(
     for field, value in update_dict.items():
         setattr(availability, field, value)
     
+    availability.status = "pending"
+    
     db.commit()
     db.refresh(availability)
     return availability
@@ -121,6 +123,48 @@ def update_availability_status(
         )
     
     availability.status = status_value
+    db.commit()
+    db.refresh(availability)
+    return availability
+
+@router.put("/{availability_id}/hours")
+def update_availability_hours(
+    availability_id: int,
+    update_data: schemas.AvailabilityUpdate,
+    db: Session = Depends(get_db)
+):
+    availability = db.query(models.EmployeeAvailability).filter(
+        models.EmployeeAvailability.id == availability_id
+    ).first()
+    
+    if not availability:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Availability not found"
+        )
+    
+    update_dict = update_data.dict(exclude_unset=True)
+    
+    time_fields = {
+        'monday_start', 'monday_end', 'tuesday_start', 'tuesday_end',
+        'wednesday_start', 'wednesday_end', 'thursday_start', 'thursday_end',
+        'friday_start', 'friday_end', 'saturday_start', 'saturday_end',
+        'sunday_start', 'sunday_end'
+    }
+    
+    fields_to_update = {k: v for k, v in update_dict.items() if k in time_fields}
+    
+    if not fields_to_update:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one weekday time field must be provided be vallah"
+        )
+    
+    for field, value in fields_to_update.items():
+        setattr(availability, field, value)
+    
+    availability.status = "pending"
+    
     db.commit()
     db.refresh(availability)
     return availability
