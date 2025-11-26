@@ -47,19 +47,21 @@ useEffect(() => {
   
   
   return (
-    <div className="bg-gray-100 border-gray-200 min-h-screen p-4 grid-cols-2">
-      <h1 className="text-center font-bold  text-xl md:text-2xl lg:text-3xl my-2">Hello back, {employerName}</h1>
+    <div className="bg-[#ffdab9] border-gray-200 min-h-screen py-4 grid-cols-2 max-h-screen">
+      <h1 className="text-center font-bold  text-xl md:text-2xl lg:text-3xl my-2 text-black">Hello back, {employerName}</h1>
       {/* Main dashboard content */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-10">
-          <div className={`bg-white rounded-xl p-4 shadow col-span-2`}>
+      <div className="flex flex-col gap-y-0  md:grid-cols-4 gap-4 mt-2">
+          <div className={`p-4 col-span-2 bg-white`}>
             {/* left panel */}
             <EmployerAnnouncements />
           </div>
 
           {/* right panel */}
-          <div>
+          <div className="bg-[#3273BD] p-4">
             hI
           </div>
+
+
         {/* Message panel */}
         {message && (
           <div
