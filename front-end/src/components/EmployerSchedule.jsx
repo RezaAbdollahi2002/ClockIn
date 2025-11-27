@@ -9,9 +9,10 @@ import { Typewriter } from 'react-simple-typewriter';
 import resourcePlugin from '@fullcalendar/resource';
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import Message from "./Message";
 
 
-const EmployerSchedule = () => {
+const EmployerSchedule = ({message,handleMessageState,setMessage}) => {
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -545,6 +546,16 @@ const EmployerSchedule = () => {
           </>
         )
       }
+
+      {message && (
+        <div
+          className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${
+            message ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <Message onClose={() => setMessage(false)} />
+        </div>
+      )}
     </div>
   );
 };

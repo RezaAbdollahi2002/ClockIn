@@ -6,9 +6,11 @@ import { useNavigate } from 'react-router-dom';
 const EmployerDashboardTeamView = () => {
     const [team, setTeam] = useState([]);
     const [page, setPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
     const employerId = localStorage.getItem("employer_id");
     const navigate = useNavigate();
     const itemsPerPage = 12; // 6 columns * 2 rows
+
 
     useEffect(() => {
         const fetchTeam = async () => {
@@ -25,24 +27,45 @@ const EmployerDashboardTeamView = () => {
     }, [employerId]);
 
     const handleClick = (t) => {
-    navigate("/employees/main",{
-        state: {employee:t.id},
-    });
-  };
+        navigate("/employees/main", {
+            state: { employee: t.id },
+        });
+    };
 
-    const totalPages = Math.ceil(team.length / itemsPerPage);
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery]);
+
+    const filteredTeam = team.filter((t) =>
+        t.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const totalPages = Math.ceil(filteredTeam.length / itemsPerPage);
     const start = (page - 1) * itemsPerPage;
-    const visibleTeam = team.slice(start, start + itemsPerPage);
+    const visibleTeam = filteredTeam.slice(start, start + itemsPerPage);
 
 
     return (
         <div className='max-h-screen'>
             <h1 className='text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-center text-white'>Team</h1>
+            {/* 🔍 Search Bar */}
+            <div className="flex justify-center mt-4">
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search employee by name..."
+                    className="px-4 py-2 w-full max-w-md rounded-md border border-gray-300  bg-white
+                               focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                />
+            </div>
 
-            {/* Team Grid */}
+            {/* Grid */}
             <div className='flex flex-col gap-y-4 md:grid md:gap-6 md:grid-cols-6 mt-4'>
                 {visibleTeam.map((t, index) => (
-                    <div className=' bg-white px-3 py-3 rounded-medium shadow-lg shadow-white hover:scale-105 durattion-300' key={index} onClick={()=>handleClick(t)}>
+                    <div className='bg-white px-3 py-3 rounded-medium shadow-lg shadow-white hover:scale-105 duration-300'
+                         key={index}
+                         onClick={() => handleClick(t)}>
+
                         <div className='flex flex-col justify-center'>
                             <div className='mx-auto my-2'>
                                 <img
@@ -56,6 +79,7 @@ const EmployerDashboardTeamView = () => {
                     </div>
                 ))}
             </div>
+
 
             {/* Pagination */}
             <div className="flex justify-center gap-4 mt-6 text-white">

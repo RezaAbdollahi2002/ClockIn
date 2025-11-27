@@ -787,10 +787,10 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
                 {/* Show the Availability */}
                 {
                     showMyAvailabilities && (
-                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <div className="fixed inset-0 z-[60] flex flex-col gap-y-2 items-center justify-center bg-black/40 backdrop-blur-sm">
                             {
                                 listOfAvailabilities.map((av, key) => (
-                                    <div className="flex flex-col bg-white px-3 py-2 rounded-sm border-gray-400 shadow-3xl shadow-blue-300" key={key}>
+                                    <div className="flex gap-y-2 flex-col bg-white px-3 py-2 rounded-sm border-gray-400 shadow-3xl shadow-blue-300" key={key}>
                                         <div className="text-gray-700 text-sm mb-1 hover:text-red-600 hover:font-semibold hover:text-medium" onClick={() => setShowMyAvailabilities(false)}>
                                             x
                                         </div>
@@ -838,7 +838,7 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
                                                 </div>
                                                 <div className="flex gap-x-3">
                                                     <h3 className="text-lg md:text:xl font-bold text-purple-800">Status</h3>
-                                                    <p className={`text-medium md:text-lg font-sans font-bold text-wrap ${av.status == "pending" ? "text-yellow-600" : av.status == "accepted" ? "text-green-500" : "text-red-600"}`}>{av.status}</p>
+                                                    <p className={`text-medium md:text-lg font-sans font-bold text-wrap ${av.status == "pending" ? "text-yellow-600" : av.status == "approved" ? "text-green-500" : "text-red-600"}`}>{av.status}</p>
                                                 </div>
                                             </div>
 
