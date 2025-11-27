@@ -252,66 +252,113 @@ def update_shift_status(shift_id: int, status: ShiftStatus, db: Session = Depend
 
 # -------------------- Shift with Chat -------------------- #
 
-# def send_shift_message(db: Session, shift: Shift, sender_id: int, text: str):
-#     employee_user = db.query(ChatUser).filter(ChatUser.employee_id == shift.employee_id).first()
-#     employer_user = db.query(ChatUser).filter(ChatUser.employer_id == shift.employer_id).first()
-
-#     conversation = (
-#         db.query(Conversation)
-#         .filter(Conversation.type == "direct")
-#         .join(Participant)
-#         .filter(Participant.user_id.in_([employee_user.id, employer_user.id]))
-#         .first()
-#     )
-#     if not conversation:
-#         conversation = Conversation(type="direct", created_at=datetime.utcnow())
-#         db.add(conversation)
-#         db.commit()
-#         db.refresh(conversation)
-#         db.add_all([
-#             Participant(user_id=employee_user.id, conversation_id=conversation.id),
-#             Participant(user_id=employer_user.id, conversation_id=conversation.id)
-#         ])
-#         db.commit()
-
-#     message = Message(
-#         conversation_id=conversation.id,
-#         sender_id=sender_id,
-#         text=text
-#     )
-#     db.add(message)
-#     db.commit()
+def send_shift_message(db: Session, shift: Shift, sender_employee_id: int = None, sender_employer_id: int = None, text: str = ""):
+    """Send a message in the direct conversation between employee and employer for a shift.
+    Provide either sender_employee_id OR sender_employer_id to identify the sender.
+    """
+    if not shift.employee_id or not shift.employer_id:
+        raise HTTPException(status_code=400, detail="Shift must have both employee and employer assigned")
+    
+    # Find or create direct conversation between employee and employer
+    conversation = (
+        db.query(Conversation)
+        .filter(Conversation.type == "direct")
+        .join(Participant)
+        .filter(
+            Participant.employee_id == shift.employee_id,
+            Participant.employer_id == shift.employer_id
+        )
+        .first()
+    )
+    
+    if not conversation:
+        # Create new direct conversation
+        conversation = Conversation(type="direct", created_at=datetime.utcnow())
+        db.add(conversation)
+        db.commit()
+        db.refresh(conversation)
+        
+        # Add both participants
+        db.add_all([
+            Participant(employee_id=shift.employee_id, conversation_id=conversation.id, role="member"),
+            Participant(employer_id=shift.employer_id, conversation_id=conversation.id, role="member")
+        ])
+        db.commit()
+    
+    # Get the sender's participant ID
+    if sender_employee_id:
+        sender_participant = db.query(Participant).filter(
+            Participant.conversation_id == conversation.id,
+            Participant.employee_id == sender_employee_id
+        ).first()
+    elif sender_employer_id:
+        sender_participant = db.query(Participant).filter(
+            Participant.conversation_id == conversation.id,
+            Participant.employer_id == sender_employer_id
+        ).first()
+    else:
+        raise HTTPException(status_code=400, detail="Must provide either sender_employee_id or sender_employer_id")
+    
+    if not sender_participant:
+        raise HTTPException(status_code=404, detail="Sender is not a participant in this conversation")
+    
+    # Create message
+    message = Message(
+        conversation_id=conversation.id,
+        sender_id=sender_participant.id,
+        text=text,
+        created_at=datetime.utcnow()
+    )
+    db.add(message)
+    conversation.last_message_at = datetime.utcnow()
+    db.commit()
 
 @router.post("/shifts/with-chat")
-def create_shift_chat(employee_id: int, employer_id: int, title: str, start_time: datetime, end_time: datetime, db: Session = Depends(get_db)):
+def create_shift_chat(employee_id: int, employer_id: int, title: str, start_time: datetime, end_time: datetime, role: str, location: str = None, description: str = None, db: Session = Depends(get_db)):
+    """Create a shift and send an automated message to the employee"""
     shift = Shift(
         employee_id=employee_id,
         employer_id=employer_id,
+        role=role,
+        location=location,
         title=title,
+        description=description,
         start_time=start_time,
-        end_time=end_time
+        end_time=end_time,
+        status=ShiftStatus.scheduled
     )
     db.add(shift)
     db.commit()
     db.refresh(shift)
 
     send_shift_message(
-        db, shift, sender_id=employer_id,
+        db, shift,
+        sender_employer_id=employer_id,
         text=f"📅 New shift assigned: {title} from {start_time} to {end_time}"
     )
     return shift
 
 @router.put("/shifts/{shift_id}/status-with-chat")
-def update_shift_chat(shift_id: int, status: ShiftStatus, updater_id: int, db: Session = Depends(get_db)):
+def update_shift_chat(
+    shift_id: int,
+    status: ShiftStatus,
+    updater_employee_id: int = None,
+    updater_employer_id: int = None,
+    db: Session = Depends(get_db)
+):
+    """Update shift status and send a message. Provide either updater_employee_id or updater_employer_id."""
     shift = db.query(Shift).filter(Shift.id == shift_id).first()
     if not shift:
-        return {"error": "Shift not found"}
+        raise HTTPException(status_code=404, detail="Shift not found")
+    
     shift.status = status
     db.commit()
     db.refresh(shift)
 
     send_shift_message(
-        db, shift, sender_id=updater_id,
+        db, shift,
+        sender_employee_id=updater_employee_id,
+        sender_employer_id=updater_employer_id,
         text=f"🔔 Shift '{shift.title}' status updated to: {status.value}"
     )
     return shift

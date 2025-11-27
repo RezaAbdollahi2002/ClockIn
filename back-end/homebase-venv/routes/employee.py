@@ -241,3 +241,33 @@ def get_employees(
             "profile_picture": profile_url,
         })
     return result
+
+
+@router.delete("/employees/{employee_id}")
+def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    """Delete an employee and cascade all related data"""
+    employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    
+    if not employee:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Employee not found"
+        )
+    
+    shifts = db.query(models.Shift).filter(models.Shift.employee_id == employee_id).all()
+    for shift in shifts:
+        shift.employee_id = None  # Unassign instead of delete
+    
+    db.query(models.ShiftCoverRequest).filter(
+        models.ShiftCoverRequest.requester_id == employee_id
+    ).delete(synchronize_session=False)
+    
+    db.query(models.ShiftTradeRequest).filter(
+        (models.ShiftTradeRequest.proposer_id == employee_id) |
+        (models.ShiftTradeRequest.target_employee_id == employee_id)
+    ).delete(synchronize_session=False)
+    
+    db.delete(employee)
+    db.commit()
+    
+    return {"detail": "Employee and all related data deleted successfully"}
