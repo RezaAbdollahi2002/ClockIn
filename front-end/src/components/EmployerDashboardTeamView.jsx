@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AvatarImage from "../assets/Avatar.webp";
+import { useNavigate } from 'react-router-dom';
 
 const EmployerDashboardTeamView = () => {
     const [team, setTeam] = useState([]);
     const [page, setPage] = useState(1);
     const employerId = localStorage.getItem("employer_id");
-
+    const navigate = useNavigate();
     const itemsPerPage = 12; // 6 columns * 2 rows
 
     useEffect(() => {
@@ -23,9 +24,16 @@ const EmployerDashboardTeamView = () => {
         fetchTeam();
     }, [employerId]);
 
+    const handleClick = (t) => {
+    navigate("/employees/main",{
+        state: {employee:t.id},
+    });
+  };
+
     const totalPages = Math.ceil(team.length / itemsPerPage);
     const start = (page - 1) * itemsPerPage;
     const visibleTeam = team.slice(start, start + itemsPerPage);
+
 
     return (
         <div className='max-h-screen'>
@@ -34,7 +42,7 @@ const EmployerDashboardTeamView = () => {
             {/* Team Grid */}
             <div className='flex flex-col gap-y-4 md:grid md:gap-6 md:grid-cols-6 mt-4'>
                 {visibleTeam.map((t, index) => (
-                    <div className=' bg-white px-3 py-3 rounded-medium shadow-lg shadow-white hover:scale-105 durattion-300' key={index}>
+                    <div className=' bg-white px-3 py-3 rounded-medium shadow-lg shadow-white hover:scale-105 durattion-300' key={index} onClick={()=>handleClick(t)}>
                         <div className='flex flex-col justify-center'>
                             <div className='mx-auto my-2'>
                                 <img
