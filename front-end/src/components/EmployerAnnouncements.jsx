@@ -137,11 +137,11 @@ const EmployerAnnouncements = () => {
   const visibleAnnouncements = showAll ? announcements : announcements.slice(0, 2);
 
   return (
-    <div className="text-black mt-5">
+    <div className="text-black mt-5 md:grid mg:grid-cols-2">
 
       {/* Action buttons */}
       <div className="flex justify-center gap-x-2 align-top text-center ">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold  ">Announcement</h1>
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-white ">Announcement</h1>
         <button
           className="text-black  text-sm bg-gray-300 px-2 rounded-sm"
           onClick={() => setCreateAnnouncement(true)}
@@ -319,7 +319,7 @@ const EmployerAnnouncements = () => {
         visibleAnnouncements.map((announcement, index) => (
           <div
             key={announcement.id || index}
-            className="border shadow-2xl mr-2  px-3 py-3 bg-gray-white text-black w-full my-2 rounded-sm "
+            className="border shadow-2xl mr-2  px-3 py-3 bg-gray-white bg-white  text-black w-full my-2 "
           >
             <div className="flex justify-between alignment items-center">
               <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>
@@ -363,7 +363,7 @@ const EmployerAnnouncements = () => {
                 rel="noopener noreferrer"
                 className="text-blue-600 underline"
               >
-                {announcement.attachment_url.split("/").pop()}
+                {(announcement.attachment_url || "").split("/").pop()}
               </a>
             </div>
 

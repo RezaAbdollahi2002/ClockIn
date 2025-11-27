@@ -71,7 +71,7 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage }) => {
     <div className="relative min-w-[700px] max-w-full overflow-x-auto max-h-screen ">
       {/* Navbar */}
       <Navbar messageState={handleMessageState} />
-      <div className="w-full h-auto flex justify-center mt-5 ">
+      <div className="w-full h-auto flex justify-center mt-12 ">
         <h1 className="font-bold md:text-2xl text-medium">Schedule</h1>
       </div>
 

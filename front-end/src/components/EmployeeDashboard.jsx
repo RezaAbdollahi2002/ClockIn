@@ -24,8 +24,8 @@ const EmployeeDashboard = ({ message, setMessage }) => {
   }, [employeeId]);
 
   return (
-    <div className="bg-[#F7F7FC    ] min-h-screen relative top-0 pt-8">
-      <h1 className="md:text-3xl text-xl font-semibold text-center mb-2 text-black">
+    <div className="bg-[#F7F7FC] min-h-screen max-h-screen relative top-0 pt-8">
+      <h1 className="md:text-3xl text-xl font-bold mt-3 text-center mb-2 text-black">
         Welcome Back, {employeeName}
       </h1>
 

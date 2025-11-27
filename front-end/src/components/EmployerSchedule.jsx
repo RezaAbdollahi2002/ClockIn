@@ -270,7 +270,7 @@ const EmployerSchedule = () => {
             <input className="p-1 border" type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
             <input className="p-1 border" type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
-            <select className="p-1 border" value={status} onChange={(e) => setStatus(e.target.value || "Completed")}>
+            <select className="p-1 border" value={status} onChange={(e) => setStatus("")}>
               <option value="scheduled">Scheduled</option>
               <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
@@ -400,9 +400,8 @@ const EmployerSchedule = () => {
                   resourceTimeGridPlugin,
                   dayGridPlugin,
                   timeGridPlugin,
-                  ,
                   interactionPlugin]}
-                initialView="resourceTimeGridWeek"
+                initialView="timeGridWeek"
                 resources={resources}
                 events={events}
                 resourceAreaHeaderContent="Employees"  // left column title

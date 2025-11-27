@@ -136,7 +136,7 @@ useEffect(() => {
   if (userId && firstName) {
     fetchConversationsNames();
   }
-}, [userId, firstName,conversations]);
+}, [userId, firstName]);
 
   
 

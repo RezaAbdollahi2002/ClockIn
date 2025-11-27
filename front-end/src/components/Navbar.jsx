@@ -24,7 +24,7 @@ const Navbar = ({ messageState }) => {
   return (
     <>
       {/* Navbar */}
-      <div className="grid grid-cols-2 px-2 bg-[#1a1365] w-full py-2 items-center justify-between text-white font-semibold fixed top-0 z-50">
+      <div className="grid grid-cols-2 px-2 bg-[#1a1365] w-full py-2 items-center justify-between text-white font-semibold fixed top-0 z-50 ">
         {/* Left side */}
         <div className="hidden md:flex md:gap-3 items-center ">
           <Link

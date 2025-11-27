@@ -56,7 +56,7 @@ const App = () => {
         <Route path='/onboarding/sign-up/user-account-edit-checking' element={<UserCheckingAccountInfo />} />
         <Route path='/onboarding/sign-up/employee-dashboard' element={
           <>
-            <Navbar messageState={handleMessageState}/>
+            <Navbar  messageState={handleMessageState}/>
             <EmployeeDashboard message={message} setMessage={setMessage} />
           </>
         }
