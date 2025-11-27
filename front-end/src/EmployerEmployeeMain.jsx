@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Message } from "./components";
 import axios from "axios";
 import AvatarImage from "../src/assets/Avatar.webp"; // adjust relative path as needed
@@ -8,9 +9,9 @@ import ShowAvailability from "./components/EmployerEmployeeMain/ShowAvailability
 const EmployerEmployeeMain = ({ message, handleMessageState, setMessage }) => {
   const { state } = useLocation();
   const employeeId = state?.employee;
-
   const [employee, setEmployee] = useState(null);
   const [showAvailabilityToggle, setShowAvailabilityToggle] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!employeeId) return;
@@ -41,13 +42,26 @@ const EmployerEmployeeMain = ({ message, handleMessageState, setMessage }) => {
     return <div className="text-white">Loading employee...</div>;
   }
 
+  const handleRemove = async () => {
+    try {
+      const confirmed = window.confirm("Are you sure you want to delete this employee?");
+      if (confirmed) {
+        await axios.delete(`/api/employees/${employeeId}`);
+        navigate('/onboarding/sign-up/employer-dashboard');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
   return (
     <div>
       {/* Top buttons */}
       <div className="flex gap-x-3 justify-center mt-5">
         <ul className="flex gap-x-3">
           <li>
-            <button className="text-base lg:text-lg rounded-medium border-gray-500 font-semibold bg-amber-200 px-2 py-1 shadow-lg hover:text-white hover:bg-amber-700 duration-300 hover:cursor-grab">
+            <button
+              onClick={handleRemove}
+              className="text-base lg:text-lg rounded-medium border-gray-500 font-semibold bg-amber-200 px-2 py-1 shadow-lg hover:text-white hover:bg-amber-700 duration-300 hover:cursor-grab">
               Remove
             </button>
           </li>
@@ -124,9 +138,8 @@ const EmployerEmployeeMain = ({ message, handleMessageState, setMessage }) => {
 
       {message && (
         <div
-          className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${
-            message ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            }`}
         >
           <Message onClose={() => setMessage(false)} />
         </div>

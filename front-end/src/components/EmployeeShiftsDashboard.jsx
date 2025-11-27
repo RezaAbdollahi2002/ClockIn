@@ -42,7 +42,7 @@ const EmployeeShiftsDashboard = ({ employee_id }) => {
       {!loading && !error && shifts.length === 0 && (
         <p className="text-black-500 font-semibold ">No shifts available</p>
       )}
-      <div className="p-4 rounded-lg shadow-xl  w-full max-w-full flex flex-col gap-y-4 border-black border-2 bg-transparent">
+      <div className="p-4 rounded-lg shadow-xl  w-full max-w-full flex flex-col gap-y-4 border-black border-2 bg-transparent max-h-[250px] overflow-y-auto">
         {!loading &&
           !error &&
           shifts.map((shift, index) => (

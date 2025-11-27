@@ -245,6 +245,7 @@ useEffect(() => {
         participants,
         name: chatType === "group" ? groupName.trim() : selectedMembers[0]?.full_name || "Direct Chat"
       };
+      console.log("Payload: ",payload);
 
       await axios.post(`${BASE_URL}conversation`, payload);
       await fetchConversations();

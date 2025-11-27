@@ -141,7 +141,10 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-settings'
-          element={<EmployerSettings />}
+          element={<EmployerSettings  
+            message={message}
+              handleMessageState={handleMessageState}
+              setMessage={setMessage}/>}
         >
           <Route index element={<EmployerProfile />} />
           <Route

@@ -40,14 +40,27 @@ const EmployeeAnnouncement = () => {
                 <li key={a.id ?? index}>
 
                   <div className=" shadow-xl px-2 py-1 border-2   rounded-lg text-black bg-white">
-                    <div className='flex justify-between'>
-                      <h1 className="text-black font-bold text-medium md:text-xl text-center px-1">{a.title}</h1>
+                    <div className='flex flex-col'>
+                      <div>
+                        <h1 className="text-black font-bold text-medium md:text-xl text-center px-1 ">{a.title}</h1>
+                      </div>
+                      <div className='flex gap-x-2 justify-between'>
+                        <div className='flex gap-x-4'>
+                          <p className='text-gray-800 font-semibold'>Created <span className='text-red-800 ml-1'>{a.created_at}</span></p>
+                          <p className='text-gray-800 font-semibold'>Exprires <span className='text-red-800 ml-1'>{a.expires_at}</span></p>
+                        </div>
+                        {
+                          a.attachment_url && (
+                            <>
+                              <a href={`/api/${a.attachment_url}`} className='text-blue-800 '>Attachment</a>
 
-                      <button className='text-xs text-gray-800 justify-between' onClick={() => setShowAttachment(!showAttachment)}>Attachment</button>
-
+                            </>
+                          )
+                        }
+                      </div>
                     </div>
 
-                    <hr className='my-2'/>
+                    <hr className='my-2' />
                     {isExpanded ? (
                       <p className="w-full break-words px-2 py-1 text-white">
                         {a.message}

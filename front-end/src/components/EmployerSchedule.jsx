@@ -213,7 +213,7 @@ const EmployerSchedule = ({message,handleMessageState,setMessage}) => {
   if (error) return <p className="text-red-500">{error}</p>;
   return (
     <div>
-      <EmployerNavbar />
+      <EmployerNavbar  messageState={handleMessageState} />
 
       <div className="bg-gray-800 text-white font-semibold">
         <ul className="flex gap-x-4 pl-4 py-2">
