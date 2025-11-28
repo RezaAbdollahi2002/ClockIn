@@ -45,7 +45,7 @@ const Team = ({ message, handleMessageState, setMessage }) => {
       )}
 
       {/* Page container */}
-      <div className="w-full px-4">
+      <div className="w-full px-4 mt-10">
         {/* Team list */}
         <div className="w-full transition-all duration-700">
           <h1 className="text-lg md:text-xl lg:text-3xl font-bold text-purple-950 my-3">

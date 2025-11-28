@@ -153,7 +153,7 @@ const EmployerAnnouncements = () => {
       {/* Create Modal */}
       {createAnnouncement && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
-          <div className="border border-gray-500 shadow-2xl px-6 py-4 bg-white rounded-xl">
+          <div className="border border-gray-500 shadow-2xl px-6 py-4 bg-white rounded-xl ">
             <p
               className="text-left text-blue-600 cursor-pointer hover:underline mb-3"
               onClick={() => setCreateAnnouncement(false)}
@@ -319,7 +319,7 @@ const EmployerAnnouncements = () => {
           visibleAnnouncements.map((announcement, index) => (
             <div
               key={announcement.id || index}
-              className="border shadow-2xl mr-2  px-3 py-3 bg-gray-white bg-white max-w-[600px] justify-center  text-black w-full my-2 "
+              className="border shadow-2xl mr-2 rounded-sm px-3 py-3 bg-gray-white bg-white max-w-[600px] justify-center  text-black w-full my-2 max-h-[600px] overflow-y-auto"
             >
               <div className="flex justify-between alignment items-center rounded:lg">
                 <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>
@@ -342,31 +342,33 @@ const EmployerAnnouncements = () => {
               {expandedId === announcement.id ? (
                 <p className="text-sm px-2 w-full break-words">
                   {announcement.message}
-                  <span className="text-xs text-gray-700 cursor-pointer ml-1" onClick={() => setExpandedId(null)}>
+                  <span className="text-md text-gray-400 font-bold cursor-pointer ml-1" onClick={() => setExpandedId(null)}>
                     less
                   </span>
                 </p>
               ) : (
                 <p className="text-sm px-2 w-full break-words">
                   {announcement.message.slice(0, 200)}...
-                  <span className="text-xs text-gray-700 cursor-pointer ml-1" onClick={() => setExpandedId(announcement.id)}>
+                  <span className="text-md text-gray-400 cursor-pointer ml-1" onClick={() => setExpandedId(announcement.id)}>
                     more
                   </span>
                 </p>
               )}
-              <p className="text-left text-red-500 text-xs lg:text-sm px-2">{announcement.expires_at}</p>
-              <div className="flex items-center gap-2">
-                📄
-                <a
-                  href={`http://127.0.0.1:8000/${announcement.attachment_url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  {(announcement.attachment_url || "").split("/").pop()}
-                </a>
+              
+              <div className="flex gap-x-3 mt-1">
+                <p className="text-left text-red-500 text-xs lg:text-sm px-2">{announcement.expires_at}</p>
+                <div className="flex items-center gap-2">
+                  📄
+                  <a
+                    href={`http://127.0.0.1:8000/${announcement.attachment_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {(announcement.attachment_url || "").split("/").pop()}
+                  </a>
+                </div>
               </div>
-
             </div>
           ))}
       </div>

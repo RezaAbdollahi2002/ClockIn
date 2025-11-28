@@ -21,7 +21,7 @@ const LocationsAndPINs = () => {
   }, [employeeId])
 
   return (
-    <div className='flex flex-col mx-2 w-full h-screen'>
+    <div className='flex flex-col mx-2 w-full h-screen mt-10'>
       <h1 className='text-lg md:text-xl font-bold my-2'>Locations & PINs</h1>
       <div className='flex flex-col border rounded-sm border-gray-400 bg-white px-2 py-2 max-w-[400px]'>
         <div className='flex justify-between'>

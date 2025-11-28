@@ -46,8 +46,8 @@ const EmployeeAnnouncement = () => {
                       </div>
                       <div className='flex gap-x-2 justify-between'>
                         <div className='flex gap-x-4'>
-                          <p className='text-gray-800 font-semibold'>Created <span className='text-red-800 ml-1'>{a.created_at}</span></p>
-                          <p className='text-gray-800 font-semibold'>Exprires <span className='text-red-800 ml-1'>{a.expires_at}</span></p>
+                          <p className='text-gray-800 font-semibold md:text-md text-sm'>Created <span className='text-red-800 ml-1'>{a.created_at}</span></p>
+                          <p className='text-gray-800 font-semibold md:text-md text-sm'>Exprires <span className='text-red-800 ml-1'>{a.expires_at}</span></p>
                         </div>
                         {
                           a.attachment_url && (
