@@ -5,8 +5,8 @@ import {
   OwnerSignup, OwnerMotivation, BusinessInfoOwnerSignUp, CreateOwnerAccount,
   SignupEmployee, UserSignup, UserContactInfoSignup, UserAccountinfo,
   UserCheckingAccountInfo, EmployeeDashboard, FinalizeOwnerAccount, EmployeeSettings,
-  Team, Message, EmployerDashboard, EmployerProfile,EmployerSettings,EmployeeSchedule, EmployerSchedule,
-  EmployerNavbar,EmployeeAvailabilities,
+  Team, Message, EmployerDashboard, EmployerProfile, EmployerSettings, EmployeeSchedule, EmployerSchedule,
+  EmployerNavbar, EmployeeAvailabilities,
   Navbar
 } from './components';
 import HomePage from './pages/HomePage';
@@ -84,7 +84,10 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-schedule'
-          element={<EmployerSchedule />}
+          element={<EmployerSchedule
+            message={message}
+            handleMessageState={handleMessageState}
+            setMessage={setMessage} />}
         />
 
         {/* Employee Routes */}
@@ -138,7 +141,10 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-settings'
-          element={<EmployerSettings />}
+          element={<EmployerSettings  
+            message={message}
+              handleMessageState={handleMessageState}
+              setMessage={setMessage}/>}
         >
           <Route index element={<EmployerProfile />} />
           <Route

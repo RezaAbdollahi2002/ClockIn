@@ -52,7 +52,7 @@ useEffect(() => {
       <h1 className="text-center font-bold  text-xl md:text-2xl lg:text-3xl my-4 mt-3 text-black">Hello back, {employerName}</h1>
       {/* Main dashboard content */}
       <div className="flex flex-col gap-y-0  md:grid-cols-4 gap-4 mt-2">
-          <div className={`p-4 col-span-2 bg-[#3E0C46]`}>
+          <div className={`p-4 col-span-2 bg-gray-200`}>
             {/* left panel */}
             <EmployerAnnouncements />
           </div>

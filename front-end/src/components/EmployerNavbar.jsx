@@ -10,13 +10,18 @@ const EmployerNavbar = ({ messageState }) => {
     if (!confirm) return;
 
     console.log("Signing out...");
-    navigate("/accounts/sign-in"); 
+    navigate("/accounts/sign-in");
   };
 
   const messageStateFunction = () => {
-    const newValue = !message;   // ✅ compute next state
+    const newValue = !message;
     setMessages(newValue);
-    messageState(newValue);      // ✅ pass the updated value up
+
+    if (typeof messageState === "function") {
+      messageState(newValue);
+    } else {
+      console.warn("messageState prop is missing or not a function");
+    }
   };
 
   return (
