@@ -363,7 +363,106 @@ def update_shift_chat(
     )
     return shift
 
-# -------------------- Cover Requests -------------------- #
+@router.get("/shifts/cover-available")
+def get_cover_shifts(employee_id: int, db: Session = Depends(get_db)):
+    """Get all shifts available for cover requests for a specific employee's employer"""
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    available_shifts = db.query(Shift).options(
+        joinedload(Shift.employee)
+    ).filter(
+        Shift.employer_id == employee.employer_id,
+        Shift.publish_status == "published",
+        Shift.employee_id != employee_id,
+        Shift.employee_id.isnot(None),
+        Shift.status == ShiftStatus.scheduled
+    ).order_by(Shift.start_time).all()
+    
+    result = []
+    for shift in available_shifts:
+        result.append({
+            "id": shift.id,
+            "employee_id": shift.employee_id,
+            "employer_id": shift.employer_id,
+            "role": shift.role,
+            "location": shift.location,
+            "title": shift.title,
+            "description": shift.description,
+            "start_time": shift.start_time,
+            "end_time": shift.end_time,
+            "status": shift.status.value,
+            "employee": {
+                "id": shift.employee.id,
+                "first_name": shift.employee.first_name,
+                "last_name": shift.employee.last_name,
+                "profile_picture": shift.employee.profile_picture
+            } if shift.employee else None
+        })
+    return result
+
+@router.get("/shifts/trade-available")
+def get_trade_shifts(employee_id: int, db: Session = Depends(get_db)):
+    """Get all shifts available for trade for a specific employee"""
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    employee_shifts = db.query(Shift).filter(
+        Shift.employee_id == employee_id,
+        Shift.publish_status == "published",
+        Shift.status == ShiftStatus.scheduled
+    ).all()
+    
+    other_shifts = db.query(Shift).options(
+        joinedload(Shift.employee)
+    ).filter(
+        Shift.employer_id == employee.employer_id,
+        Shift.publish_status == "published",
+        Shift.employee_id != employee_id,
+        Shift.employee_id.isnot(None),
+        Shift.status == ShiftStatus.scheduled
+    ).order_by(Shift.start_time).all()
+    
+    result = {
+        "my_shifts": [],
+        "available_shifts": []
+    }
+    
+    for shift in employee_shifts:
+        result["my_shifts"].append({
+            "id": shift.id,
+            "role": shift.role,
+            "location": shift.location,
+            "title": shift.title,
+            "description": shift.description,
+            "start_time": shift.start_time,
+            "end_time": shift.end_time,
+            "status": shift.status.value
+        })
+    
+    for shift in other_shifts:
+        result["available_shifts"].append({
+            "id": shift.id,
+            "employee_id": shift.employee_id,
+            "role": shift.role,
+            "location": shift.location,
+            "title": shift.title,
+            "description": shift.description,
+            "start_time": shift.start_time,
+            "end_time": shift.end_time,
+            "status": shift.status.value,
+            "employee": {
+                "id": shift.employee.id,
+                "first_name": shift.employee.first_name,
+                "last_name": shift.employee.last_name,
+                "profile_picture": shift.employee.profile_picture
+            }
+        })
+    
+    return result
+
 
 @router.post("/shifts/{shift_id}/cover-request")
 def request_shift_cover(shift_id: int, requester_id: int, db: Session = Depends(get_db)):
@@ -398,12 +497,35 @@ def respond_cover_request(request_id: int, responder_id: int, accept: bool, db: 
 
     return request
 
-# -------------------- Trade Requests -------------------- #
-
-@router.post("/shifts/{shift_id}/trade-request")
-def request_shift_trade(shift_id: int, proposer_id: int, target_employee_id: int, db: Session = Depends(get_db)):
+@router.post("/shifts/trade-request")
+def request_shift_trade(
+    proposer_shift_id: int,
+    target_shift_id: int,
+    proposer_id: int,
+    target_employee_id: int,
+    db: Session = Depends(get_db)
+):
+    """Request to trade two shifts between two employees"""
+    # Validate both shifts exist
+    proposer_shift = db.query(Shift).filter(Shift.id == proposer_shift_id).first()
+    target_shift = db.query(Shift).filter(Shift.id == target_shift_id).first()
+    
+    if not proposer_shift:
+        raise HTTPException(status_code=404, detail="Proposer shift not found")
+    if not target_shift:
+        raise HTTPException(status_code=404, detail="Target shift not found")
+    
+    # Validate proposer owns their shift
+    if proposer_shift.employee_id != proposer_id:
+        raise HTTPException(status_code=403, detail="Proposer doesn't own the proposer shift")
+    
+    # Validate target employee owns their shift
+    if target_shift.employee_id != target_employee_id:
+        raise HTTPException(status_code=403, detail="Target employee doesn't own the target shift")
+    
     trade_request = ShiftTradeRequest(
-        shift_id=shift_id,
+        proposer_shift_id=proposer_shift_id,
+        target_shift_id=target_shift_id,
         proposer_id=proposer_id,
         target_employee_id=target_employee_id,
         status="pending"
@@ -415,17 +537,28 @@ def request_shift_trade(shift_id: int, proposer_id: int, target_employee_id: int
 
 @router.put("/shifts/trade-request/{request_id}/respond")
 def respond_trade_request(request_id: int, accept: bool, db: Session = Depends(get_db)):
+    """Respond to a shift trade request. If accepted, swaps the two shifts between employees."""
     trade_request = db.query(ShiftTradeRequest).filter(ShiftTradeRequest.id == request_id).first()
     if not trade_request:
-        return {"error": "Trade request not found"}
+        raise HTTPException(status_code=404, detail="Trade request not found")
+    
     trade_request.status = "accepted" if accept else "rejected"
     db.commit()
     db.refresh(trade_request)
 
     if accept:
-        shift = db.query(Shift).filter(Shift.id == trade_request.shift_id).first()
-        shift.employee_id = trade_request.target_employee_id
+        # Get both shifts
+        proposer_shift = db.query(Shift).filter(Shift.id == trade_request.proposer_shift_id).first()
+        target_shift = db.query(Shift).filter(Shift.id == trade_request.target_shift_id).first()
+        
+        if not proposer_shift or not target_shift:
+            raise HTTPException(status_code=404, detail="One or both shifts not found")
+        
+        # Swap the employees
+        proposer_shift.employee_id, target_shift.employee_id = target_shift.employee_id, proposer_shift.employee_id
+        
         db.commit()
-        db.refresh(shift)
+        db.refresh(proposer_shift)
+        db.refresh(target_shift)
 
     return trade_request

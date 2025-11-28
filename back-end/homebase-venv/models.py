@@ -256,14 +256,16 @@ class ShiftTradeRequest(Base):
     __tablename__ = "shift_trade_requests"
 
     id = Column(Integer, primary_key=True, index=True)
-    shift_id = Column(Integer, ForeignKey("shifts.id", ondelete="CASCADE"), nullable=False)
+    proposer_shift_id = Column(Integer, ForeignKey("shifts.id", ondelete="CASCADE"), nullable=False)
+    target_shift_id = Column(Integer, ForeignKey("shifts.id", ondelete="CASCADE"), nullable=False)
     proposer_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
     target_employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
 
     status = Column(Enum(RequestStatus), default=RequestStatus.pending)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    shift = relationship("Shift", back_populates="trade_requests")
+    proposer_shift = relationship("Shift", foreign_keys=[proposer_shift_id], backref="proposer_trade_requests")
+    target_shift = relationship("Shift", foreign_keys=[target_shift_id], backref="target_trade_requests")
     proposer = relationship("Employee", foreign_keys=[proposer_id])
     target_employee = relationship("Employee", foreign_keys=[target_employee_id])
     
