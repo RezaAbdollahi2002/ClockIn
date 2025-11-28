@@ -6,6 +6,7 @@ from database import get_db
 from models import (
     Shift, ShiftStatus, ShiftCoverRequest, ShiftTradeRequest, Conversation, Participant, Message,Employee, Employer
 )
+from models import RequestStatus
 import schemas
 
 router = APIRouter(tags=["Shifts"])
@@ -205,6 +206,132 @@ def get_coworker_shifts(employee_id: int, db: Session = Depends(get_db)):
     shifts = db.query(Shift).filter(Shift.employer_id == employer_id).all()
     return shifts
 
+@router.get("/shifts/cover-available")
+def get_cover_shifts(employer_id: int, db: Session = Depends(get_db)):
+    """Get all pending cover requests for an employer (by employer_id)."""
+    cover_requests = (
+        db.query(ShiftCoverRequest)
+        .join(Shift)
+        .options(
+            joinedload(ShiftCoverRequest.shift).joinedload(Shift.employee),
+            joinedload(ShiftCoverRequest.requester)
+        )
+        .filter(
+            Shift.employer_id == employer_id,
+            ShiftCoverRequest.status == RequestStatus.pending
+        )
+        .order_by(ShiftCoverRequest.created_at)
+        .all()
+    )
+
+    result = []
+    for req in cover_requests:
+        shift = req.shift
+        requester = req.requester
+        result.append({
+            "request_id": req.id,
+            "status": req.status.value,
+            "created_at": req.created_at,
+            "shift": {
+                "id": shift.id,
+                "employee_id": shift.employee_id,
+                "employer_id": shift.employer_id,
+                "role": shift.role,
+                "location": shift.location,
+                "title": shift.title,
+                "description": shift.description,
+                "start_time": shift.start_time,
+                "end_time": shift.end_time,
+                "status": shift.status.value
+            } if shift else None,
+            "requester": {
+                "id": requester.id,
+                "first_name": requester.first_name,
+                "last_name": requester.last_name,
+                "profile_picture": requester.profile_picture
+            } if requester else None
+        })
+    return result
+
+@router.get("/shifts/trade-available")
+def get_trade_shifts(employer_id: int, db: Session = Depends(get_db)):
+    """Get all pending shift trade requests for an employer"""
+    trade_requests = (
+        db.query(ShiftTradeRequest)
+        .join(Shift, ShiftTradeRequest.proposer_shift_id == Shift.id)
+        .options(
+            joinedload(ShiftTradeRequest.proposer_shift).joinedload(Shift.employee),
+            joinedload(ShiftTradeRequest.target_shift).joinedload(Shift.employee),
+            joinedload(ShiftTradeRequest.proposer),
+            joinedload(ShiftTradeRequest.target_employee)
+        )
+        .filter(
+            Shift.employer_id == employer_id,
+            ShiftTradeRequest.status == RequestStatus.pending
+        )
+        .order_by(ShiftTradeRequest.created_at)
+        .all()
+    )
+
+    result = []
+    for trade_request in trade_requests:
+        proposer_shift = trade_request.proposer_shift
+        target_shift = trade_request.target_shift
+        proposer = trade_request.proposer
+        target_employee = trade_request.target_employee
+
+        result.append({
+            "trade_request_id": trade_request.id,
+            "status": trade_request.status.value,
+            "created_at": trade_request.created_at,
+            "proposer_shift": {
+                "id": proposer_shift.id,
+                "role": proposer_shift.role,
+                "location": proposer_shift.location,
+                "title": proposer_shift.title,
+                "description": proposer_shift.description,
+                "start_time": proposer_shift.start_time,
+                "end_time": proposer_shift.end_time,
+                "status": proposer_shift.status.value,
+                "employee": {
+                    "id": proposer_shift.employee.id,
+                    "first_name": proposer_shift.employee.first_name,
+                    "last_name": proposer_shift.employee.last_name,
+                    "profile_picture": proposer_shift.employee.profile_picture
+                } if proposer_shift.employee else None
+            },
+            "target_shift": {
+                "id": target_shift.id,
+                "role": target_shift.role,
+                "location": target_shift.location,
+                "title": target_shift.title,
+                "description": target_shift.description,
+                "start_time": target_shift.start_time,
+                "end_time": target_shift.end_time,
+                "status": target_shift.status.value,
+                "employee": {
+                    "id": target_shift.employee.id,
+                    "first_name": target_shift.employee.first_name,
+                    "last_name": target_shift.employee.last_name,
+                    "profile_picture": target_shift.employee.profile_picture
+                } if target_shift.employee else None
+            },
+            "proposer": {
+                "id": proposer.id,
+                "first_name": proposer.first_name,
+                "last_name": proposer.last_name,
+                "profile_picture": proposer.profile_picture
+            },
+            "target_employee": {
+                "id": target_employee.id,
+                "first_name": target_employee.first_name,
+                "last_name": target_employee.last_name,
+                "profile_picture": target_employee.profile_picture
+            }
+        })
+    
+    return result
+
 @router.get("/shifts/{user_id}")
 def get_user_shifts(user_id: int, db: Session = Depends(get_db)):
     shift = db.query(Shift).filter(Shift.id == user_id).first()
@@ -359,109 +486,9 @@ def update_shift_chat(
         db, shift,
         sender_employee_id=updater_employee_id,
         sender_employer_id=updater_employer_id,
-        text=f"🔔 Shift '{shift.title}' status updated to: {status.value}"
+        text=f"Shift '{shift.title}' status updated to: {status.value}"
     )
     return shift
-
-@router.get("/shifts/cover-available")
-def get_cover_shifts(employee_id: int, db: Session = Depends(get_db)):
-    """Get all shifts available for cover requests for a specific employee's employer"""
-    employee = db.query(Employee).filter(Employee.id == employee_id).first()
-    if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    
-    available_shifts = db.query(Shift).options(
-        joinedload(Shift.employee)
-    ).filter(
-        Shift.employer_id == employee.employer_id,
-        Shift.publish_status == "published",
-        Shift.employee_id != employee_id,
-        Shift.employee_id.isnot(None),
-        Shift.status == ShiftStatus.scheduled
-    ).order_by(Shift.start_time).all()
-    
-    result = []
-    for shift in available_shifts:
-        result.append({
-            "id": shift.id,
-            "employee_id": shift.employee_id,
-            "employer_id": shift.employer_id,
-            "role": shift.role,
-            "location": shift.location,
-            "title": shift.title,
-            "description": shift.description,
-            "start_time": shift.start_time,
-            "end_time": shift.end_time,
-            "status": shift.status.value,
-            "employee": {
-                "id": shift.employee.id,
-                "first_name": shift.employee.first_name,
-                "last_name": shift.employee.last_name,
-                "profile_picture": shift.employee.profile_picture
-            } if shift.employee else None
-        })
-    return result
-
-@router.get("/shifts/trade-available")
-def get_trade_shifts(employee_id: int, db: Session = Depends(get_db)):
-    """Get all shifts available for trade for a specific employee"""
-    employee = db.query(Employee).filter(Employee.id == employee_id).first()
-    if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    
-    employee_shifts = db.query(Shift).filter(
-        Shift.employee_id == employee_id,
-        Shift.publish_status == "published",
-        Shift.status == ShiftStatus.scheduled
-    ).all()
-    
-    other_shifts = db.query(Shift).options(
-        joinedload(Shift.employee)
-    ).filter(
-        Shift.employer_id == employee.employer_id,
-        Shift.publish_status == "published",
-        Shift.employee_id != employee_id,
-        Shift.employee_id.isnot(None),
-        Shift.status == ShiftStatus.scheduled
-    ).order_by(Shift.start_time).all()
-    
-    result = {
-        "my_shifts": [],
-        "available_shifts": []
-    }
-    
-    for shift in employee_shifts:
-        result["my_shifts"].append({
-            "id": shift.id,
-            "role": shift.role,
-            "location": shift.location,
-            "title": shift.title,
-            "description": shift.description,
-            "start_time": shift.start_time,
-            "end_time": shift.end_time,
-            "status": shift.status.value
-        })
-    
-    for shift in other_shifts:
-        result["available_shifts"].append({
-            "id": shift.id,
-            "employee_id": shift.employee_id,
-            "role": shift.role,
-            "location": shift.location,
-            "title": shift.title,
-            "description": shift.description,
-            "start_time": shift.start_time,
-            "end_time": shift.end_time,
-            "status": shift.status.value,
-            "employee": {
-                "id": shift.employee.id,
-                "first_name": shift.employee.first_name,
-                "last_name": shift.employee.last_name,
-                "profile_picture": shift.employee.profile_picture
-            }
-        })
-    
-    return result
 
 
 @router.post("/shifts/{shift_id}/cover-request")
@@ -473,7 +500,7 @@ def request_shift_cover(shift_id: int, requester_id: int, db: Session = Depends(
     cover_request = ShiftCoverRequest(
         shift_id=shift.id,
         requester_id=requester_id,
-        status="pending"
+        status=RequestStatus.pending
     )
     db.add(cover_request)
     db.commit()

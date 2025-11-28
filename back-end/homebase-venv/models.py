@@ -183,7 +183,6 @@ class Shift(Base):
     employee = relationship("Employee", backref="shifts")
     employer = relationship("Employer", backref="shifts")
     cover_requests = relationship("ShiftCoverRequest", back_populates="shift", cascade="all, delete-orphan")
-    trade_requests = relationship("ShiftTradeRequest", back_populates="shift", cascade="all, delete-orphan")
 
 # --------------- Availabilities ----------
 
@@ -264,8 +263,8 @@ class ShiftTradeRequest(Base):
     status = Column(Enum(RequestStatus), default=RequestStatus.pending)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    proposer_shift = relationship("Shift", foreign_keys=[proposer_shift_id], backref="proposer_trade_requests")
-    target_shift = relationship("Shift", foreign_keys=[target_shift_id], backref="target_trade_requests")
+    proposer_shift = relationship("Shift", foreign_keys=[proposer_shift_id])
+    target_shift = relationship("Shift", foreign_keys=[target_shift_id])
     proposer = relationship("Employee", foreign_keys=[proposer_id])
     target_employee = relationship("Employee", foreign_keys=[target_employee_id])
     
