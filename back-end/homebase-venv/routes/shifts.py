@@ -207,8 +207,14 @@ def get_coworker_shifts(employee_id: int, db: Session = Depends(get_db)):
     return shifts
 
 @router.get("/shifts/cover-available")
-def get_cover_shifts(employer_id: int, db: Session = Depends(get_db)):
-    """Get all pending cover requests for an employer (by employer_id)."""
+def get_cover_shifts(employee_id: int, db: Session = Depends(get_db)):
+    """Get all pending cover requests for an employer (by employee_id)."""
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    employer_id = employee.employer_id
+    
     cover_requests = (
         db.query(ShiftCoverRequest)
         .join(Shift)
@@ -254,8 +260,14 @@ def get_cover_shifts(employer_id: int, db: Session = Depends(get_db)):
     return result
 
 @router.get("/shifts/trade-available")
-def get_trade_shifts(employer_id: int, db: Session = Depends(get_db)):
-    """Get all pending shift trade requests for an employer"""
+def get_trade_shifts(employee_id: int, db: Session = Depends(get_db)):
+    """Get all pending shift trade requests for an employer (by employee_id)"""
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    employer_id = employee.employer_id
+    
     trade_requests = (
         db.query(ShiftTradeRequest)
         .join(Shift, ShiftTradeRequest.proposer_shift_id == Shift.id)
