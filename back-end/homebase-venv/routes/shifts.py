@@ -11,18 +11,17 @@ import schemas
 
 router = APIRouter(tags=["Shifts"])
 
-# -------------------- Shift CRUD -------------------- #
+# -------------------- Shift -------------------- #
 
 @router.post("/shifts", response_model=schemas.ShiftCreate)
 def create_shift(
     shift: schemas.ShiftCreate,
     db: Session = Depends(get_db)
 ):
-    # Check if a shift overlaps with an existing one for the same employee
     overlapping_shift = db.query(Shift).filter(
         Shift.employee_id == shift.employee_id,
-        Shift.start_time < shift.end_time,   # Existing shift starts before new shift ends
-        Shift.end_time > shift.start_time    # Existing shift ends after new shift starts
+        Shift.start_time < shift.end_time,
+        Shift.end_time > shift.start_time
     ).first()
 
     if overlapping_shift:
@@ -31,7 +30,6 @@ def create_shift(
             detail="Employee already has a shift that overlaps with this time."
         )
 
-    # Create new shift
     new_shift = Shift(**shift.dict())
     db.add(new_shift)
     db.commit()
@@ -79,7 +77,6 @@ def get_shifts(employer_id:int, published: bool, db: Session = Depends(get_db)):
             joinedload(Shift.employee) 
         ).filter(Shift.employer_id == employer_id, Shift.publish_status == "unpublished").order_by(Shift.start_time).all()
 
-    # Convert to dicts
     result = []
     for shift in shifts:
         result.append({
@@ -361,10 +358,8 @@ def get_employees(employer_id : int,request: Request, db: Session = Depends(get_
         profile_url = None
         if emp.profile_picture:
             if emp.profile_picture.startswith("static/"):
-                # Use the static mount
-                profile_url = str(request.base_url) + emp.profile_picture  # e.g. /static/profile_pictures/...
+                profile_url = str(request.base_url) + emp.profile_picture
             else:
-                # Use the uploads mount
                 profile_url = str(request.base_url) + f"{emp.profile_picture.lstrip('/')}"
         result.append({
             "id": emp.id,
@@ -398,7 +393,6 @@ def send_shift_message(db: Session, shift: Shift, sender_employee_id: int = None
     if not shift.employee_id or not shift.employer_id:
         raise HTTPException(status_code=400, detail="Shift must have both employee and employer assigned")
     
-    # Find or create direct conversation between employee and employer
     conversation = (
         db.query(Conversation)
         .filter(Conversation.type == "direct")
@@ -411,20 +405,17 @@ def send_shift_message(db: Session, shift: Shift, sender_employee_id: int = None
     )
     
     if not conversation:
-        # Create new direct conversation
         conversation = Conversation(type="direct", created_at=datetime.utcnow())
         db.add(conversation)
         db.commit()
         db.refresh(conversation)
         
-        # Add both participants
         db.add_all([
             Participant(employee_id=shift.employee_id, conversation_id=conversation.id, role="member"),
             Participant(employer_id=shift.employer_id, conversation_id=conversation.id, role="member")
         ])
         db.commit()
     
-    # Get the sender's participant ID
     if sender_employee_id:
         sender_participant = db.query(Participant).filter(
             Participant.conversation_id == conversation.id,
@@ -441,7 +432,6 @@ def send_shift_message(db: Session, shift: Shift, sender_employee_id: int = None
     if not sender_participant:
         raise HTTPException(status_code=404, detail="Sender is not a participant in this conversation")
     
-    # Create message
     message = Message(
         conversation_id=conversation.id,
         sender_id=sender_participant.id,
@@ -473,7 +463,7 @@ def create_shift_chat(employee_id: int, employer_id: int, title: str, start_time
     send_shift_message(
         db, shift,
         sender_employer_id=employer_id,
-        text=f"📅 New shift assigned: {title} from {start_time} to {end_time}"
+        text=f" New shift assigned: {title} from {start_time} to {end_time}"
     )
     return shift
 
@@ -545,7 +535,6 @@ def request_shift_trade(
     db: Session = Depends(get_db)
 ):
     """Request to trade two shifts between two employees"""
-    # Validate both shifts exist
     proposer_shift = db.query(Shift).filter(Shift.id == proposer_shift_id).first()
     target_shift = db.query(Shift).filter(Shift.id == target_shift_id).first()
     
@@ -554,11 +543,9 @@ def request_shift_trade(
     if not target_shift:
         raise HTTPException(status_code=404, detail="Target shift not found")
     
-    # Validate proposer owns their shift
     if proposer_shift.employee_id != proposer_id:
         raise HTTPException(status_code=403, detail="Proposer doesn't own the proposer shift")
     
-    # Validate target employee owns their shift
     if target_shift.employee_id != target_employee_id:
         raise HTTPException(status_code=403, detail="Target employee doesn't own the target shift")
     
@@ -586,14 +573,12 @@ def respond_trade_request(request_id: int, accept: bool, db: Session = Depends(g
     db.refresh(trade_request)
 
     if accept:
-        # Get both shifts
         proposer_shift = db.query(Shift).filter(Shift.id == trade_request.proposer_shift_id).first()
         target_shift = db.query(Shift).filter(Shift.id == trade_request.target_shift_id).first()
         
         if not proposer_shift or not target_shift:
             raise HTTPException(status_code=404, detail="One or both shifts not found")
         
-        # Swap the employees
         proposer_shift.employee_id, target_shift.employee_id = target_shift.employee_id, proposer_shift.employee_id
         
         db.commit()
