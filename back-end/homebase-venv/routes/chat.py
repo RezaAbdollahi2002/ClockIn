@@ -21,9 +21,11 @@ from models import Conversation, Participant, Message, Employee, Employer
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
 # --------- File uploads ----------
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads", "chat")
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Project root: one level up from routes/
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CHAT_UPLOAD_DIR = os.path.join(PROJECT_ROOT, "uploads", "chat")
+os.makedirs(CHAT_UPLOAD_DIR, exist_ok=True)
+UPLOAD_FOLDER = CHAT_UPLOAD_DIR
 
 # --------- WS in-memory store ----------
 active_connections = {}  # {conversation_id: List[WebSocket]}
@@ -495,7 +497,7 @@ def send_message(
             file.file.close()
 
         # Store relative path for serving later
-        attachment_url = f"/uploads/chat/{unique_filename}"
+        attachment_url = f"uploads/chat/{unique_filename}"
         if ext in [".mp3", ".wav", ".m4a", ".ogg"]:
             attachment_type = "audio"
         elif ext in [".jpg", ".jpeg", ".png", ".gif", ".webp"]:

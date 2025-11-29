@@ -135,7 +135,7 @@ def get_shifts(employee_id:int, db: Session = Depends(get_db)):
 
 @router.get("/employee/shifts-dashboard", response_model=List[schemas.ShiftEmployeeDashboard])
 def get_employee_shift_dashboard(employee_id:int, db: Session = Depends(get_db)):
-    employee_shifts = db.query(Shift).filter(Shift.employee_id == employee_id).all()
+    employee_shifts = db.query(Shift).filter(Shift.employee_id == employee_id).order_by(Shift.id.desc()).all()
     if not employee_shifts:
         raise HTTPException(status_code=404, detail="No shifts available")
     print("Query result:", employee_shifts)

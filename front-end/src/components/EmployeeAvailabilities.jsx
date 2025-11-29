@@ -1095,7 +1095,7 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
 
 
                 <div
-                    className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+                    className={`absolute min-h-screen -top-5 bottom-0  h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
                         }`}
                 >
                     <Message onClose={() => setMessage(false)} />

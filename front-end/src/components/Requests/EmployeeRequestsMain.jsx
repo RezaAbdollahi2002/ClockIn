@@ -30,11 +30,11 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
   useEffect(() => {
     if (!employeeId) return;
     const getEmployer = async () => {
-      try{
-      const res = await axios.get(`/api/shifts/employee`, null, { params: { "employee_id": employeeId } });
+      try {
+        const res = await axios.get(`/api/shifts/employee`, null, { params: { "employee_id": employeeId } });
         setEmployerId(res.data.employer_id);
         console.log("EmployrId: ", res.data.employer_id);
-      }catch(err){
+      } catch (err) {
         console.error(err);
       }
 
@@ -155,7 +155,7 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
   };
 
   return (
-    <div className='mt-10 px-10 py-5 '>
+    <div className='mt-10 px-10 py-5 lg:mx-60'>
       {/* Top */}
       <div >
         <div className='flex justify-center gap-x-3'>
@@ -171,34 +171,33 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
           <h1 className='text-gray-800 text-center font-semibold md:text-xl'>Cover & Trade</h1>
           <hr className='text-blue-800 font-bold ' />
           {/* body */}
-          <div className='max-h-[600px] overflow-y-auto space-y-3  border-gray-300 mx-3'>
+          <div className='max-h-[600px] overflow-y-auto space-y-3  border-gray-300 mx-3 '>
             {
               shifts.map((shift, key) => (
                 <div
-
-                  key={key} className='border-2 px-2 py-1 rounded-md border-gray-300 shadow-sm grid grid-cols-2 text-sm md:text-md '>
-                  <div className='flex flex-col gap-y-3'>
-                    <h1 className='text-purple-800 font-semibold'>Title <span className='text-gray-800 text-sm font:md'>{shift.title}</span></h1>
-                    <h1 className='text-purple-800 font-semibold'>Role <span className='text-gray-800 text-sm font:md'>{shift.role}</span></h1>
-                    <h1 className='text-purple-800 font-semibold'>Location <span className='text-gray-800 text-sm font:md'>{shift.location}</span></h1>
-                    <h1 className='text-purple-800 font-semibold'>Description <span className='text-gray-800 text-sm font:md'>{shift.description}</span></h1>
+                  key={key}
+                  className='border-2 px-2 py-1 rounded-md border-gray-300 shadow-sm text-sm md:text-md '>
+                  <div className='md:grid md:grid-cols-2 flex flex-col gap-y-3 '>
+                    <div className='flex flex-col gap-y-3'>
+                      <h1 className='text-purple-800 font-semibold text-sm'>Title <span className='text-gray-800 text-xs font:md'>{shift.title}</span></h1>
+                      <h1 className='text-purple-800 font-semibold text-sm'>Role <span className='text-gray-800 text-xs font:md'>{shift.role}</span></h1>
+                      <h1 className='text-purple-800 font-semibold text-sm'>Location <span className='text-gray-800 text-xs font:md'>{shift.location}</span></h1>
+                      <h1 className='text-purple-800 font-semibold text-sm' >Description <span className='text-gray-800 text-xs font:md'>{shift.description}</span></h1>
+                    </div>
+                    <div className='flex flex-col gap-y-3'>
+                      <h1 className='text-purple-800 font-semibold text-sm md:text-md ' >Start Time <span className='text-gray-800 text-xs font:md'>{formatDateTime(shift.start_time)}</span></h1>
+                      <h1 className='text-purple-800 font-semibold text-sm md:text:md'>End Time <span className='text-gray-800 text-xs font:md'>{formatDateTime(shift.end_time)}</span></h1>
+                    </div>
                   </div>
-                  <div className='flex flex-col gap-y-2'>
-                    <h1 className='text-purple-800 font-semibold'>Start Time <span className='text-gray-800 text-sm font:md'>{formatDateTime(shift.start_time)}</span></h1>
-                    <h1 className='text-purple-800 font-semibold'>End Time <span className='text-gray-800 text-sm font:md'>{formatDateTime(shift.end_time)}</span></h1>
-                  </div>
 
-                  <button
-                    onClick={() => handleRequestCover(shift.id)}
-                    className='text-gray-700 bg-purple-300 border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800  text-center w-full'>
-                    Request Cover
-                  </button>
                   <button
                     onClick={() => handleRequestTrade(shift.id)}
-                    className='text-gray-700 bg-purple-300 ml-1 border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800  text-center w-full'>
+                    className='text-gray-700 bg-purple-300  border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800  text-center w-full'>
                     Request Trade
                   </button>
+
                 </div>
+
               ))
             }
           </div>
@@ -209,7 +208,7 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
           <h1 className='text-gray-800 text-center font-semibold   md:text-xl'>Claim</h1>
           <hr className='text-blue-800 font-bold ' />
           {/* Body */}
-          <div className='px-3 py-2 md:grid md:grid-cols-2 md:gap-x-2 flex flex-col'>
+          <div className='px-3 py-2  md:gap-x-2 flex flex-col'>
             {/* Left */}
             <div className='border-2 px-2 py-2 rounded-sm border-gray-800 max-h-[600px] overflow-y-auto'>
               <h1 className='text-center font-semibold text-md md:text-lg'>Need Cover</h1>
@@ -256,34 +255,14 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
                 ))
               }
             </div>
-            {/* Right */}
-            <div className='border-2 border-blue-200 px-2 py-2 '>
-              <div className='flex justify-center gap-x-2'>
-                <h1 className='text-center font-semibold text-md md:text-lg'>Trade</h1>
-                <button className='text-xs rounded-md bg-green-500 text-gray-800  border-black  shadow-sm  px-1 py-1'>Trade</button>
-              </div>
-              <hr className='my-2' />
-              <div className='px-2 py-1 border-gray-800'>
-                {
-
-                }
-              </div>
-            </div>
           </div>
         </div>
       </div>
       {
-        tradeMode && (
-          <div>
-
-          </div>
-        )
-      }
-      {
         <>
 
           <div
-            className={`absolute top-0 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            className={`absolute top-10 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
               }`}
           >
             <Message onClose={() => setMessage(false)} />

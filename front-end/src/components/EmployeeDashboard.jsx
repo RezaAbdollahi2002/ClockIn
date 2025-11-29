@@ -37,7 +37,7 @@ const EmployeeDashboard = ({ message, setMessage }) => {
   }, [employeeId])
 
   return (
-    <div className="bg-[#F7F7FC] min-h-screen max-h-screen relative top-0 pt-8">
+    <div className="bg-[#FCFFF3] min-h-screen max-h-screen relative top-0 pt-8">
       <div className="flex flex-col gap-x-3 justify-center">
         {/* image */}
         <div>
@@ -54,15 +54,16 @@ const EmployeeDashboard = ({ message, setMessage }) => {
         {/* Left panel */}
 
         <div className="col-span-1 md:col-span-4 lg:col-span-2  rounded-xl p-4 overflow-auto max-h-[90vh] bg-[#FFFFFF] shadow-2xl shadow-blue-700 border-black border-2 ">
+          <h2 className="text-xl font-bold mb-3 mx-4 text-[#4A148C] mt-4">My Shifts</h2>
+          <div className="px-6">
+            <EmployeeShiftsDashboard employee_id={employeeId} />
+          </div>
           <h2 className="text-xl font-bold mb-3 mx-4 text-[#4A148C]">Announcements</h2>
           <div className="px-6">
             < EmployeeAnnouncement />
           </div>
 
-          <h2 className="text-xl font-bold mb-3 mx-4 text-[#4A148C] mt-4">My Shifts</h2>
-          <div className="px-6">
-            <EmployeeShiftsDashboard employee_id={employeeId} />
-          </div>
+
         </div>
 
         {/* Right panel */}
@@ -80,7 +81,7 @@ const EmployeeDashboard = ({ message, setMessage }) => {
         <>
 
           <div
-            className={`absolute top-0 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            className={`absolute top-9.5 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
               }`}
           >
             <Message onClose={() => setMessage(false)} />

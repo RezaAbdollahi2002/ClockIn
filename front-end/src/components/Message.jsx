@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { IoCloseSharp } from "react-icons/io5";
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
+import ExpandableText from "./ExpandableText ";
 
 const BASE_URL = "/api/chat/";
 
@@ -23,11 +24,10 @@ const Message = ({ onClose }) => {
   const [firstName, setFirstName] = useState(null);
   // 
   const [me, setMe] = useState(null);
-  const [he, setHe] = useState(null);
   const [myName, setMyName] = useState(null);
-  const navigate = useNavigate();
-
-
+  const [currentFileType, setCurrentFileType] = useState("");
+  const [currentFile, setCurrentFile] = useState("");
+  const [showCurrentFile, setShowCurrentFile] = useState(false);
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -103,26 +103,7 @@ const Message = ({ onClose }) => {
       console.error(err);
     }
   };
-  const changeConversationName = (firstName) => {
-    setConversations((prevConversations) =>
-      prevConversations.map((conv) => {
-        const parts = conv.name.split("&"); // ["Reza", "Alex"]
-
-        // if conversation has exactly two names
-        if (parts.length === 2) {
-          if (parts[0] === firstName) {
-            return { ...conv, name: parts[1] }; // return the other one
-          } else if (parts[1] === firstName) {
-            return { ...conv, name: parts[0] };
-          }
-        }
-
-        // if no match or not 2 parts, leave it unchanged
-        return conv;
-      })
-    );
-  };
-
+ 
 
   useEffect(() => {
     fetchConversations();
@@ -233,8 +214,11 @@ const Message = ({ onClose }) => {
     const payload = new FormData();
     payload.append("conversation_id", activeConversation.id);
     payload.append("sender_id", userId);
-    if (text) payload.append("text", text);
-    if (file) payload.append("file", file);
+    if(text){
+       payload.append("text", text) } else{
+        payload.append("text", "");
+       };
+    if(file) payload.append("file", file);
     // message problem
     const res = await axios.post(`${BASE_URL}message`, payload);
     setMessages((prev) => [
@@ -250,6 +234,34 @@ const Message = ({ onClose }) => {
     ]);
     setFile(null);
     if (ws.current) ws.current.send(JSON.stringify({ text, sender_id: userId }));
+    // attachment type
+    try {
+      const res = await axios.get(`/api/chat/messages/${activeConversation.id}`);
+      setMessages(res.data);
+    console.log("message" + JSON.stringify(res.data, null, 2));
+
+    ws.current = new WebSocket(`ws://localhost:8000/chat/ws/${conv.id}`);
+
+    ws.current.onopen = () => console.log("Connected via WebSocket");
+
+    ws.current.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        setMessages((prev) => [...prev, msg.message || msg]);
+      } catch {
+        console.log("Received:", event.data);
+      }
+    };
+
+    ws.current.onclose = () => console.log("WebSocket closed");
+      setCurrentFileType(res.data.attachment_type)
+      setCurrentFile(res.data.attachment_url);
+      console.log("current file: ", res.data.attachment_url);
+      setShowCurrentFile(true);
+      console.log(showCurrentFile);
+    } catch (err) {
+      console.error(err);
+    }
 
   };
 
@@ -333,7 +345,7 @@ const Message = ({ onClose }) => {
   );
 
   return (
-    <div className="flex flex-col   h-[100%] max-w-[350px]  bg-gray-50 ">
+    <div className="flex flex-col   h-[100%] max-w-[350px]  bg-gray-50  mt-0">
       {/* Conversation List / New Message */}
       {!activeConversation && (
         <div className="bg-white  flex flex-col h-[90vh] overflow-hidden">
@@ -353,7 +365,7 @@ const Message = ({ onClose }) => {
                     <div key={index}>
 
                       {/* Correct way to call the converter */}
-                      {()=>conversationNameConvertor(conv, userId)}
+                      {() => conversationNameConvertor(conv, userId)}
 
                       <li
                         className="cursor-pointer bg-[#062D5B] p-2 text-white border border-gray-400 mb-2 shadow-2xl hover:bg-gray-100 hover:text-black rounded font-bold"
@@ -363,7 +375,7 @@ const Message = ({ onClose }) => {
 
                           {/* Show the other person's name */}
                           <span>
-                            { conv.type === "group" ? conv.name : conv.name
+                            {conv.type === "group" ? conv.name : conv.name
                               .split("&")[0] === myName ? conv.name.split("&")[1] : conv.name.split("&")[0]
                             }
                           </span>
@@ -474,14 +486,13 @@ const Message = ({ onClose }) => {
             {/* Title */}
             <h2 className="font-bold text-lg text-center w-full">
               <div className="flex gap-4">
-                <img src={``} className="rounded-100 w-4 h-4" />
-                <h1>{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1>
+                <h1 className="ml-8 text-md md:text-lg font-bold">{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1>
               </div>
 
             </h2>
           </div>
           {/* Message */}
-          <div className="flex-1 overflow-y-auto flex flex-col space-y-2 mb-2 pr-2 mt-1">
+          <div className="flex-1 overflow-y-auto flex flex-col space-y-2 mb-2 pr-2 mt-1 text-xs ">
             {messages.map((msg, index) => (
               <div
                 key={msg.id || index}
@@ -490,11 +501,14 @@ const Message = ({ onClose }) => {
               >
                 <div
                   className={`px-3 py-2 rounded-lg max-w-xs break-words ${msg.sender_id === me
-                    ? "bg-blue-500 text-white"
+                    ? "bg-blue-200 text-black"
                     : "bg-gray-200 text-gray-900"
                     }`}
                 >
-                  {msg.text}
+                  <ExpandableText text={msg.text || ""} limit={100}/>
+                  {/* {(msg.text || "").length > 50
+                    ? (msg.text.substring(0, 50) + "…")
+                    : msg.text} */}
                   {msg.attachment_url && (() => {
                     const url = msg.attachment_url;
                     const isImage = /\.(jpe?g|png|gif|webp|svg)$/i.test(url);
@@ -503,18 +517,18 @@ const Message = ({ onClose }) => {
                       <>
                         <div>
                           <img
-                            src={`http://localhost:8000${url}`}
+                            src={`/api/${url}`}
                             alt="Attachment"
-                            className="mt-2 max-w-[%5] rounded-md border border-gray-300 shadow-sm"
+                            className="mt-2 max-w-[200px] max-h-[120px] rounded-md border border-gray-300 shadow-xl "
                           />
-                          <a href={`http://localhost:8000${url}`}>file</a>
+                          {/* <a href={`/api/${url}`}>download</a> */}
                         </div>
                       </>
 
 
                     ) : (
                       <a
-                        href={`http://localhost:8000${url}`}
+                        href={`/api/${url}`}
                         target="_blank"
                         rel="noreferrer"
                         className="block text-xs text-blue-700 mt-1 underline"
@@ -554,11 +568,12 @@ const Message = ({ onClose }) => {
               />
             </label>
 
+
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded "
+              className="bg-green-600 text-white px-4 py-2 rounded-md "
               onClick={() => {
                 if (messageText.trim()) {
-                  sendMessage(messageText);
+                  sendMessage(messageText );
                   setMessageText("");
                 }
               }}
@@ -566,8 +581,43 @@ const Message = ({ onClose }) => {
               Send
             </button>
           </div>
+
         </div>
       )}
+      {showCurrentFile && currentFile && (() => {
+        const url = currentFile;
+        const isImage = /\.(jpe?g|png|gif|webp|svg)$/i.test(url);
+
+        return isImage ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
+            <button className="text-gray-800 text-md" onClick={() => setShowCurrentFile((prev) => !prev)}>X</button>
+            <img
+              src={`/api/${url}`}
+              alt="Attachment"
+              className="mt-2 max-w-[95%] rounded-md border border-gray-300 shadow-sm"
+            />
+
+            <a
+              href={`/api/${url}`}
+              className="absolute bottom-10 text-white underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open File
+            </a>
+          </div>
+        ) : (
+          <a
+            href={`/api/${url}`}
+            target="_blank"
+            rel="noreferrer"
+            className="block text-xs text-blue-700 mt-1 underline"
+          >
+            📎 File
+          </a>
+        );
+      })()}
+
     </div>
   );
 };

@@ -47,17 +47,23 @@ const EmployeeShiftsDashboard = ({ employee_id }) => {
           !error &&
           shifts.map((shift, index) => (
             <>
-              <div className="bg-blue-100 px-2 py-2 rounded-md hover:bg-purple-100 duration-75 ">
-                <div className="flex gap-1 ">
-                  <h3 className="font-bold text-medium ">Role:</h3>
-                  <h3 className="font-semibold text-gray-800">{shift.role}</h3>
+              <div className="bg-[#EBF0F0] px-2 py-2 rounded-md hover:bg-[#CFD2D2] duration-75 ">
+                <div className="flex-col  md:flex  gap-x-1  ">
+                  <div className="flex gap-1">
+                    <h3 className="font-bold text-medium md:text-lg text-purple-800 ">Role:</h3>
+                    <h3 className="font-semibold text-gray-800 text-sm md:text-md mt-1">{shift.role}</h3>
+                    
+                  </div>
+                  <div className="flex gap-1 ">
+                      <h3 className="font-bold text-medium md:text-lg text-purple-800 ">Location</h3>
+                      <h3 className="font-semibold text-gray-800 text-sm md:text-md mt-1">{shift.location}</h3>
+                    </div>
                 </div>
-                <hr className="font-bold" />
-                <p className="text-black">
-                  {new Date(shift.start_time).toLocaleString()} –{" "}
+                <hr className="font-bold my-1" />
+                <p className="text-gray-800">
+                  {new Date(shift.start_time).toLocaleString()} <span className="text-purple-800 font-bold text-md">-</span>{" "}
                   {new Date(shift.end_time).toLocaleString()}
                 </p>
-                <p className="text-gray-700">{shift.location}</p>
               </div>
             </>
 
