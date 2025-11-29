@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { IoCloseSharp } from "react-icons/io5";
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
@@ -20,6 +21,12 @@ const Message = ({ onClose }) => {
   const [role, setRole] = useState("");
   const [showImage, setShowImage] = useState(false);
   const [firstName, setFirstName] = useState(null);
+  // 
+  const [me, setMe] = useState(null);
+  const [he, setHe] = useState(null);
+  const [myName, setMyName] = useState(null);
+  const navigate = useNavigate();
+
 
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
@@ -43,6 +50,34 @@ const Message = ({ onClose }) => {
   }, [userId]);
 
   useEffect(() => {
+    if (!employeeId) {
+      const getName = async () => {
+        try {
+          const res = await axios.get(`/api/employer/seetings/${employerId}/employer-info`);
+          setMyName(res.data.first_name);
+          console.log("myname is: ", res.data.firs_name);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      getName();
+    } else if (!employerId) {
+      const getName = async () => {
+        try {
+          const res = await axios.get(`employees/seetings/${employeeId}/employee-info`);
+          setMyName(res.data.first_name);
+          console.log("myname is: ", myName);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      getName();
+    }
+
+
+  }, [employeeId])
+
+  useEffect(() => {
     const fetchEmployeeInfo = async () => {
       try {
         const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
@@ -58,16 +93,20 @@ const Message = ({ onClose }) => {
     }
   }, [userId]);
 
-
+  // refresh
 
   const fetchConversations = async () => {
-    const res = await axios.get(`${BASE_URL}conversations/${userId}`);
-    setConversations(res.data);
+    try {
+      const res = await axios.get(`${BASE_URL}conversations/${userId}`);
+      setConversations(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
   const changeConversationName = (firstName) => {
     setConversations((prevConversations) =>
       prevConversations.map((conv) => {
-        const parts = conv.name.split(" and "); // ["Reza", "Alex"]
+        const parts = conv.name.split("&"); // ["Reza", "Alex"]
 
         // if conversation has exactly two names
         if (parts.length === 2) {
@@ -90,55 +129,55 @@ const Message = ({ onClose }) => {
   }, [userId]);
 
   // 1. Fetch user info once
-useEffect(() => {
-  const fetchUserInfo = async () => {
-    try {
-      const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
-      const fetchedFirstName = res.data.first_name || "employee";
-      setFirstName(fetchedFirstName);
-      console.log("Fetched first name:", fetchedFirstName);
-    } catch (err) {
-      console.error(err);
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await axios.get(`/api/employees/settings/${userId}/employee-info`);
+        const fetchedFirstName = res.data.first_name || "employee";
+        setFirstName(fetchedFirstName);
+        console.log("Fetched first name:", fetchedFirstName);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (userId) fetchUserInfo();
+  }, [userId]);
+
+  // 2. Fetch & clean conversations
+  const fetchConversationsNames = async () => {
+    if (!employeeId) {
+      try {
+        const res = await axios.get(`/api/chat/employer/conversation/${employerId}`);
+        let data = res.data;
+
+        setConversations(data);
+      } catch (err) {
+        console.error(err);
+      }
+    } else if (!employerId) {
+      try {
+        const res = await axios.get(`/api/chat/employee/conversation/${employeeId}`);
+        let data = res.data;
+        // Clean names right here using firstName
+
+
+        setConversations(data);
+      } catch (err) {
+        console.error(err);
+      }
     }
+
   };
 
-  if (userId) fetchUserInfo();
-}, [userId]);
-
-// 2. Fetch & clean conversations
-const fetchConversationsNames = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}conversations/${userId}`);
-    let data = res.data;
-
-    // Clean names right here using firstName
-    if (firstName) {
-      data = data.map(conv => {
-        if (conv.name && conv.name.includes(" and ")) {
-          const splitName = conv.name.split(" and ");
-          return {
-            ...conv,
-            name: splitName[0] === firstName ? splitName[1] : splitName[0],
-          };
-        }
-        return conv;
-      });
+  // 3. Load conversations when userId OR firstName is ready
+  useEffect(() => {
+    if (userId && firstName) {
+      fetchConversationsNames();
     }
+  }, [userId, firstName]);
 
-    setConversations(data);
-  } catch (err) {
-    console.error(err);
-  }
-};
 
-// 3. Load conversations when userId OR firstName is ready
-useEffect(() => {
-  if (userId && firstName) {
-    fetchConversationsNames();
-  }
-}, [userId, firstName]);
-
-  
 
 
 
@@ -160,6 +199,13 @@ useEffect(() => {
     setMessages([]);
 
     if (ws.current) ws.current.close();
+    try {
+      // Conversation problem 2
+      const res = await axios.get(`/api/chat/conversation/${conv.id}/participants`);
+      setMe(res.data[0].id);
+    } catch (err) {
+      console.error(err);
+    }
 
     const res = await axios.get(`${BASE_URL}messages/${conv.id}`);
     setMessages(res.data);
@@ -189,7 +235,7 @@ useEffect(() => {
     payload.append("sender_id", userId);
     if (text) payload.append("text", text);
     if (file) payload.append("file", file);
-
+    // message problem
     const res = await axios.post(`${BASE_URL}message`, payload);
     setMessages((prev) => [
       ...prev,
@@ -204,6 +250,7 @@ useEffect(() => {
     ]);
     setFile(null);
     if (ws.current) ws.current.send(JSON.stringify({ text, sender_id: userId }));
+
   };
 
   // Toggle member selection
@@ -245,7 +292,7 @@ useEffect(() => {
         participants,
         name: chatType === "group" ? groupName.trim() : selectedMembers[0]?.full_name || "Direct Chat"
       };
-      console.log("Payload: ",payload);
+      console.log("Payload: ", payload);
 
       await axios.post(`${BASE_URL}conversation`, payload);
       await fetchConversations();
@@ -301,24 +348,39 @@ useEffect(() => {
               {/* Conversations finder  */}
               <h2 className="font-bold mb-2 text-center mt-2 text-lg lg:text-xl">Conversations</h2>
               <ul className="flex-1 overflow-y-auto ">
-                {conversations.map((conv, index) => (
-                  <div >
-                    {() => conversationNameConvertor(conv, userId)}
-                    <li
-                      key={index}
-                      className="cursor-pointer bg-[#062D5B] p-2 text-white border border-gray-400 mb-2 shadow-2xl bg- hover:bg-gray-100 hover:text-black rounded font-bold"
-                      onClick={() => openConversation(conv)}
-                    >
-                      <div className="flex justify-between">
-                        <span>{conv.name}</span>
-                        <span className="text-xs text-gray-400">
-                          {new Date(conv.last_message_at).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    </li>
-                  </div>
+                {conversations.length > 0 ? (
+                  conversations.map((conv, index) => (
+                    <div key={index}>
 
-                ))}
+                      {/* Correct way to call the converter */}
+                      {()=>conversationNameConvertor(conv, userId)}
+
+                      <li
+                        className="cursor-pointer bg-[#062D5B] p-2 text-white border border-gray-400 mb-2 shadow-2xl hover:bg-gray-100 hover:text-black rounded font-bold"
+                        onClick={() => openConversation(conv)}
+                      >
+                        <div className="flex justify-between">
+
+                          {/* Show the other person's name */}
+                          <span>
+                            { conv.type === "group" ? conv.name : conv.name
+                              .split("&")[0] === myName ? conv.name.split("&")[1] : conv.name.split("&")[0]
+                            }
+                          </span>
+
+                          <span className="text-xs text-gray-400">
+                            {new Date(conv.last_message_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </li>
+                    </div>
+                  ))
+                ) : (
+                  <div>
+                    <h1>No Conversation</h1>
+                  </div>
+                )}
+
               </ul>
               <button
                 className="bg-purple-600 text-white px-2 py-1 rounded mb-3 overflow-auto hover:scale-102 duration-75 mt-2"
@@ -397,45 +459,37 @@ useEffect(() => {
 
       {/* Chat View */}
       {activeConversation && (
-        <div className="bg-white p-3 flex flex-col h-[90vh]">
+        <div className="bg-white  flex flex-col h-[90vh]  overflow-y-auto">
 
-          <div className="flex items-center justify-between w-full relative">
+          <div className="flex items-center justify-between w-full relative bg-gray-200 text-black">
             {/* Back Button */}
             <button
               className="absolute left-0 flex items-center p-2"
               onClick={() => setActiveConversation(null)}
             >
-              <MdOutlineArrowBackIosNew className="w-4 h-4 text-gray-500" />
+              <MdOutlineArrowBackIosNew className="w-4 h-4 text-gray-800 font-bold text-lg" />
+
             </button>
 
             {/* Title */}
             <h2 className="font-bold text-lg text-center w-full">
               <div className="flex gap-4">
                 <img src={``} className="rounded-100 w-4 h-4" />
-                <h1>{activeConversation.name}</h1>
+                <h1>{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1>
               </div>
 
             </h2>
           </div>
-
-
-
-          <div className="flex-1 overflow-y-auto flex flex-col space-y-2 mb-2 pr-2">
+          {/* Message */}
+          <div className="flex-1 overflow-y-auto flex flex-col space-y-2 mb-2 pr-2 mt-1">
             {messages.map((msg, index) => (
               <div
                 key={msg.id || index}
-                className={`flex items-end ${msg.sender_id === userId ? "justify-end" : "justify-start"
+                className={`flex items-end ${msg.sender_id === me ? "justify-end " : "justify-start"
                   }`}
               >
-                {/* {msg.sender_id !== userId && (
-                  <img
-                    src={`/api/${msg.sender_profile || "/default-avatar.png"}`}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full mr-2"
-                  />
-                )} */}
                 <div
-                  className={`px-3 py-2 rounded-lg max-w-xs break-words ${msg.sender_id === userId
+                  className={`px-3 py-2 rounded-lg max-w-xs break-words ${msg.sender_id === me
                     ? "bg-blue-500 text-white"
                     : "bg-gray-200 text-gray-900"
                     }`}

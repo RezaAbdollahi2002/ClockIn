@@ -62,7 +62,7 @@ const EmployeeAnnouncement = () => {
 
                     <hr className='my-2' />
                     {isExpanded ? (
-                      <p className="w-full break-words px-2 py-1 text-white">
+                      <p className="w-full break-words px-2 py-1 text-black">
                         {a.message}
                         <button
                           type="button"

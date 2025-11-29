@@ -1,6 +1,6 @@
 import asyncio
 from typing import Optional, List, Set
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import shutil
 import uuid
@@ -205,6 +205,7 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
 
 @router.get("/conversations/{user_id}")
 def get_user_conversations(user_id: int, db: Session = Depends(get_db)):
+
     convs = (
     db.query(Conversation)
     .join(Participant)
@@ -212,21 +213,74 @@ def get_user_conversations(user_id: int, db: Session = Depends(get_db)):
     .order_by(Conversation.last_message_at.desc())
     .all()
     )
+    def to_local(dt):
+        if dt is None:
+            return None
+        # If timestamp has no timezone, assume it's UTC
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone().isoformat()  # ← converts to server's local time
     return [
         {
             "id": c.id,
             "name": c.name,
             "type": c.type,
-            "created_at": c.created_at.isoformat(),
-            "last_message_at": c.last_message_at.isoformat() if c.last_message_at else None
+            "created_at": to_local(c.created_at),
+            "last_message_at": to_local(c.last_message_at),
         } for c in convs
     ]
+    
+@router.get("/employee/conversation/{employee_id}")
+def get_employee_conversations(employee_id: int, db: Session = Depends(get_db)):
+    # Optional: verify employee exists
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    # Example join logic – adjust to your actual schema
+    conversations = (
+        db.query(Conversation)
+        .join(Participant, Participant.conversation_id == Conversation.id)
+        .filter(
+            Participant.employee_id == employee_id  # or models.Participant.user_id if you store it differently
+        ).order_by(Conversation.id.desc())
+        .all()
+    )
+    # If employer has NO conversations
+    if not conversations:
+        return { "num_employee": 0 }
+
+    return conversations
+
+
+# ✅ 2) Get conversations for an EMPLOYER
+@router.get("/employer/conversation/{employer_id}")
+def get_employer_conversations(employer_id: int, db: Session = Depends(get_db)):
+    # Optional: verify employer exists
+    employer = db.query(Employer).filter(Employer.id == employer_id).first()
+    if not employer:
+        raise HTTPException(status_code=404, detail="Employer not found")
+
+    conversations = (
+        db.query(Conversation)
+        .join(Participant, Participant.conversation_id == Conversation.id)
+        .filter(
+            Participant.employer_id == employer_id  # or whatever field links employers to conversations
+        ).order_by(Conversation.id.desc())
+        .all()
+    )
+    # If employer has NO conversations
+    if not conversations:
+        return { "num_employer": 0 }
+
+    return conversations   
+    
 
 @router.get("/conversation/{conversation_id}/participants")
 def list_participants(conversation_id: int, db: Session = Depends(get_db)):
     conv = _ensure_conversation(db, conversation_id)
     return [
-        {"employee_id": p.employee_id, "employer_id": p.employer_id, "role": p.role, "joined_at": p.joined_at.isoformat()}
+        {"id":p.id,"employee_id": p.employee_id, "employer_id": p.employer_id, "role": p.role, "joined_at": p.joined_at.isoformat()}
         for p in conv.participants
     ]
 
@@ -486,6 +540,38 @@ def send_message(
                 pass
 
     return {"message_id": msg.id}
+def _get_participant(db: Session, conversation_id: int, user_id: int) -> Optional[Participant]:
+    return db.query(Participant).filter(
+        Participant.conversation_id == conversation_id,
+        (Participant.employee_id == user_id) | (Participant.employer_id == user_id)
+    ).first()
+
+
+@router.delete("/chat/remover/conversation/{conversationId}")
+def remove_conversation(
+    conversationId: int,
+    requester_id: int = Query(..., description="Employee or employer id initiating the deletion"),
+    db: Session = Depends(get_db)
+):
+    conv = _ensure_conversation(db, conversationId)
+
+    participant = _get_participant(db, conversationId, requester_id)
+    if not participant:
+        raise HTTPException(status_code=403, detail="You are not a participant in this conversation")
+
+    # Only admins can delete a group; either participant can delete a direct
+    if conv.type == "group" and participant.role != "admin":
+        raise HTTPException(status_code=403, detail="Only a group admin can delete the conversation")
+
+    try:
+        db.delete(conv)   # cascades to messages & participants
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Deletion failed: {e}")
+
+    return {"detail": f"Conversation {conversationId} deleted successfully"}
+
 
 # =========================
 # WebSocket

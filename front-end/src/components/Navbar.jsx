@@ -71,11 +71,11 @@ const Navbar = ({ messageState }) => {
           <Link to={`/onboarding/sign-up/team`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
             Team
           </Link>
-          <Link to={`/onboarding/sign-up/employee-settings`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
-            Settings
-          </Link>
           <Link to={`/employees/requests`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
             Requests
+          </Link>
+          <Link to={`/onboarding/sign-up/employee-settings`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
+            Settings
           </Link>
         </div>
 

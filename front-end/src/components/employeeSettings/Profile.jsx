@@ -63,7 +63,7 @@ const EmployeeProfile = () => {
     const reader = new FileReader();
     reader.onloadend = () => setPreview(reader.result);
     reader.readAsDataURL(file);
-    navigate(0);
+   // navigate(0);
   };
 
   const removeImage = () => {
@@ -126,6 +126,7 @@ const EmployeeProfile = () => {
         setProfilePic(null);
         setEdit(false);
         setOriginalProfileData((prev) => ({ ...profileData, profile_pic: data.profile_pic }));
+        navigate(0);
       } else {
         const err = await response.json();
         toast.error("Update failed: " + (err.detail || "Unknown error"));
