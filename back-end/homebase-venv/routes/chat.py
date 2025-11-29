@@ -31,7 +31,6 @@ active_connections = {}  # {conversation_id: List[WebSocket]}
 # =========================
 # Helper functions
 # =========================
-## ChatUser helpers removed. Use Employee/Employer directly.
 
 def _ensure_conversation(db: Session, conversation_id: int) -> Conversation:
     conv = db.query(Conversation).filter(Conversation.id == conversation_id).first()
@@ -60,7 +59,7 @@ def _is_admin(db: Session, conversation_id: int, user_id: int) -> bool:
 
 def get_or_create_direct_conversation(db: Session, user_ids: List[int]) -> Conversation:
     """Return existing direct conversation between two users or create a new one.
-       IMPORTANT: expects exactly 2 distinct user_ids (ChatUser IDs)."""
+       IMPORTANT: expects exactly 2 distinct user_ids (Employee/Employer IDs)."""
     if len(user_ids) != 2 or len(set(user_ids)) != 2:
         raise HTTPException(status_code=400, detail="Direct chat needs exactly two distinct users")
 
@@ -252,7 +251,7 @@ def rename_group(
 def add_participants(
     conversation_id: int,
     requester_id: int = Form(...),
-    participants: str = Form(...),  # CSV of ChatUser IDs
+    participants: str = Form(...),  # CSV of Employee/Employer IDs
     db: Session = Depends(get_db)
 ):
     conv = _ensure_conversation(db, conversation_id)
@@ -358,6 +357,21 @@ def set_admin(
     participant.role = "admin" if make_admin else "member"
     db.commit()
     return {"id": conv.id, "user_id": target_user_id, "role": participant.role}
+
+@router.delete("/conversation/{conversation_id}")
+def delete_conversation(
+    conversation_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a conversation.
+    """
+    conv = _ensure_conversation(db, conversation_id)
+    
+    db.delete(conv)
+    db.commit()
+    
+    return {"message": "Conversation deleted successfully"}
 
 # =========================
 # File serving endpoint
@@ -472,34 +486,6 @@ def send_message(
                 pass
 
     return {"message_id": msg.id}
-
-# =========================
-# Conversation deletion (safer)
-# =========================
-@router.delete("/chat/remover/conversation/{conversationId}")
-def remove_conversation(
-    conversationId: int,
-    requester_id: int = Query(..., description="ChatUser id initiating the deletion"),
-    db: Session = Depends(get_db)
-):
-    conv = _ensure_conversation(db, conversationId)
-
-    # Only admins can delete a group; either participant can delete a direct
-    if conv.type == "group":
-        if not _is_admin(db, conversationId, requester_id):
-            raise HTTPException(status_code=403, detail="Only a group admin can delete the conversation")
-    else:
-        if not _is_participant(db, conversationId, requester_id):
-            raise HTTPException(status_code=403, detail="Only participants can delete this conversation")
-
-    try:
-        db.delete(conv)  # cascades messages + participants
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Deletion failed: {e}")
-
-    return {"detail": f"Conversation {conversationId} deleted successfully"}
 
 # =========================
 # WebSocket

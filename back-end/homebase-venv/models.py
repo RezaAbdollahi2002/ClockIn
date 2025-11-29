@@ -70,8 +70,8 @@ class Conversation(Base):
     __table_args__ = (UniqueConstraint('type', 'name', name='uq_group_name'),)
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=True)  # Group chat name
-    type = Column(String(20), nullable=False)  # 'direct' or 'group'
+    name = Column(String(100), nullable=True)
+    type = Column(String(20), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_message_at = Column(DateTime, default=datetime.utcnow, index=True)
 
