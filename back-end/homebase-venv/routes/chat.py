@@ -167,7 +167,7 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
         name = ["", ""]
         name[0] = db.query(Employee).filter(Employee.id == participants[1]).first().first_name
         name[1] = db.query(Employee).filter(Employee.id == participants[0]).first().first_name
-        name = " & ".join(name)
+        name = "&".join(name)
         conv = Conversation(type="direct", name=name)
         db.add(conv)
         db.commit()
@@ -181,7 +181,7 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
         else:
             db.add(Participant(employer_id=participants[1], conversation_id=conv.id))
         db.commit()
-        db.refresh(conv)  # Refresh to load relationships
+        db.refresh(conv)
         return conv
 
     if type == "group":
@@ -200,7 +200,7 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
             else:
                 db.add(Participant(employer_id=pid, conversation_id=conv.id, role="admin" if idx==0 else "member"))
         db.commit()
-        db.refresh(conv)  # Refresh to load relationships
+        db.refresh(conv)
         return conv
 
 
