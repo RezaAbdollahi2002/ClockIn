@@ -19,6 +19,7 @@ import EmployerLocationsAndPINs from './components/EmployerLocationsAndPINs';
 import EmployerasswordAndSecurity from './components/EmployerasswordAndSecurity';
 import EmployerNotifications from './components/EmployerNotifications';
 import EmployerEmployeeMain from './EmployerEmployeeMain';
+import EmployeeRequestsMain from '../src/components/Requests/EmployeeRequestsMain';
 
 const App = () => {
   const [message, setMessage] = useState(false);
@@ -114,6 +115,15 @@ const App = () => {
             <>
               <Navbar messageState={handleMessageState} />
               <EmployeeDashboard message={message} setMessage={setMessage} />
+            </>
+          }
+        />
+        <Route
+          path='/employees/requests'
+          element={
+            <>
+              <Navbar messageState={handleMessageState} />
+              <EmployeeRequestsMain message={message} setMessage={setMessage} />
             </>
           }
         />

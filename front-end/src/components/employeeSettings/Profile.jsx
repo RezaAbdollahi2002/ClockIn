@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaPenFancy, FaTrashAlt } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +15,7 @@ const EmployeeProfile = () => {
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const employeeId = localStorage.getItem("employee_id");
 
@@ -61,6 +63,7 @@ const EmployeeProfile = () => {
     const reader = new FileReader();
     reader.onloadend = () => setPreview(reader.result);
     reader.readAsDataURL(file);
+    navigate(0);
   };
 
   const removeImage = () => {

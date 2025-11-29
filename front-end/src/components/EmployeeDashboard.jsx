@@ -7,11 +7,12 @@ import EmployeeShiftWeeklyReviw from './EmployeeShiftWeeklyReviw';
 import Navbar from "./Navbar";
 import EmployeeAnnouncement from "./EmployeeAnnouncement";
 import ElectricBorder from "./Animations/ElectricBorder";
-
+import Avatar from "../assets/Avatar.webp";
 
 
 const EmployeeDashboard = ({ message, setMessage }) => {
   const [employeeName, setEmployeeName] = useState("Employee");
+  const [profilePic, setProfilePic] = useState(Avatar);
   const employeeId = localStorage.getItem("employee_id");
 
 
@@ -23,12 +24,32 @@ const EmployeeDashboard = ({ message, setMessage }) => {
       .catch((err) => console.error(err));
   }, [employeeId]);
 
+  useEffect(() => {
+    const getEmployee = async () => {
+      try {
+        const res = await axios.get(`/api/employees/settings/${employeeId}/employee-info`);
+        setProfilePic(res.data.profile_pic);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    getEmployee();
+  }, [employeeId])
+
   return (
     <div className="bg-[#F7F7FC] min-h-screen max-h-screen relative top-0 pt-8">
-      <h1 className="md:text-3xl text-xl font-bold mt-3 text-center mb-2 text-black">
-        Welcome Back, {employeeName}
-      </h1>
+      <div className="flex flex-col gap-x-3 justify-center">
+        {/* image */}
+        <div>
+          <img src={`/api/${profilePic}`} className="w-[100px] h-[100px] rounded-full text-center mx-auto mt-10" />
 
+        </div>
+        <div>
+          <h1 className="md:text-3xl text-xl font-bold mt-3 text-center mb-2 text-black">
+            Welcome Back, {employeeName}
+          </h1>
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 ">
         {/* Left panel */}
 

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional, List
 import models
+import os  # ⬅️ ADD THIS
 
 from database import get_db
 from models import Announcement
@@ -10,7 +11,10 @@ import schemas
 
 router = APIRouter(prefix="/announcements", tags=["Announcements"])
 
-
+# BASE_DIR is the project root (one level up from routes/)
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))      # <project_root>
+UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")             # <project_root>/uploads
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 # ---------------------- CREATE ----------------------
 @router.post("/create", response_model=schemas.AnnouncementOut)
 def create_announcement(
@@ -35,10 +39,17 @@ def create_announcement(
     # Handle file upload
     attachment_url = None
     if attachment:
-        file_location = f"uploads/{attachment.filename}"
-        with open(file_location, "wb") as f:
+        filename = attachment.filename
+        file_path = os.path.join(UPLOAD_DIR, filename)   # <project_root>/uploads/filename
+
+        with open(file_path, "wb") as f:
             f.write(attachment.file.read())
-        attachment_url = file_location
+
+        # This is what frontend will use (relative to 127.0.0.1:8000/)
+        attachment_url = f"uploads/{filename}"
+
+        print("Saved attachment at:", file_path)
+        print("Attachment URL in DB:", attachment_url)
 
     # Save
     new_announcement = Announcement(
@@ -53,6 +64,7 @@ def create_announcement(
     db.refresh(new_announcement)
 
     return new_announcement
+
 
 
 # ---------------------- GET ALL ----------------------
@@ -82,7 +94,6 @@ def get_employee_announcements(employee_id: int, db: Session = Depends(get_db)):
 
 
 
-# ---------------------- UPDATE ----------------------
 @router.put("/edit/{announcement_id}", response_model=schemas.AnnouncementOut)
 def update_announcement(
     announcement_id: int,
@@ -96,12 +107,11 @@ def update_announcement(
     if not announcement:
         raise HTTPException(status_code=404, detail="Announcement not found")
 
-    # Update fields if provided
+    # Update fields
     if title is not None:
         announcement.title = title
     if message is not None:
         announcement.message = message
-
     if expires_at and expires_at.strip():
         try:
             announcement.expires_at = datetime.fromisoformat(expires_at)
@@ -110,10 +120,16 @@ def update_announcement(
 
     # Handle file upload
     if attachment:
-        file_location = f"uploads/{attachment.filename}"
-        with open(file_location, "wb") as f:
+        filename = attachment.filename
+        file_path = os.path.join(UPLOAD_DIR, filename)  # <project_root>/uploads/filename
+
+        with open(file_path, "wb") as f:
             f.write(attachment.file.read())
-        announcement.attachment_url = file_location
+
+        announcement.attachment_url = f"uploads/{filename}"
+
+        print("Updated attachment at:", file_path)
+        print("New attachment URL in DB:", announcement.attachment_url)
 
     db.commit()
     db.refresh(announcement)

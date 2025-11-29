@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from typing import List
 import os
 from dotenv import load_dotenv
-
 from routes.employee import router as employee_router
 from routes.employer import router as employer_router
 from routes.company import router as company_router
@@ -12,7 +11,6 @@ from routes.announcements import router as announcements_router
 from routes.availabilities import router as availabilities_router
 from routes.signin import router as signin_router
 from routes.chat import router as chat_router
-# from availabilities import router as availabilities_router
 from routers.email_router import router as email_router, start_cleanup_task
 from routers.sms_router import router as sms_router
 import models
@@ -39,12 +37,23 @@ app.add_middleware(
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
 
+
 # Static / Uploads
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "routes", "uploads")
+
+# Use a single uploads folder in the project root: <project_root>/uploads
+UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# # Static / Uploads
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "routes", "uploads")
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
+# app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include API routers
 app.include_router(employee_router)
