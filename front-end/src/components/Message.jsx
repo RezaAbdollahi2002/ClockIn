@@ -376,8 +376,9 @@ const Message = ({ onClose }) => {
                           {/* Show the other person's name */}
                           <span>
                             {conv.type === "group" ? conv.name : conv.name
-                              .split("&")[0] === myName ? conv.name.split("&")[1] : conv.name.split("&")[0]
-                            }
+                              .split("&")[0]
+                            } {conv.type === "group" ? " " : "and"} {" "}
+                            {conv.name.split("&")[1]}
                           </span>
 
                           <span className="text-xs text-gray-400">
@@ -485,8 +486,9 @@ const Message = ({ onClose }) => {
 
             {/* Title */}
             <h2 className="font-bold text-lg text-center w-full">
-              <div className="flex gap-4">
+              <div className="flex gap-4 justify-between ">
                 <h1 className="ml-8 text-md md:text-lg font-bold">{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1>
+                <h1 className="ml-8 text-md md:text-lg font-bold mr-2">{activeConversation.type === "group" ? "" : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[1]}</h1>
               </div>
 
             </h2>
