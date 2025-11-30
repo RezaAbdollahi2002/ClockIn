@@ -34,19 +34,6 @@ class AutoShiftRequest(BaseModel):
 async def generate_text(prompt: Prompt):
     """
     Sends a prompt to Google Gemini and returns the response.
-    valid :
-{
-  "employer_id": 1,
-  "start_date": "2025-12-20",
-  "end_date": "2025-12-21",
-  "roles": [
-    "Lifeguard"
-  ],
-  "location": "Erie",
-  "shifts_per_day": 1,
-  "hours_per_shift": 1,
-  "additional_instructions": "shifts."
-}
     """
     model = genai.GenerativeModel("gemini-2.5-pro")
     response = model.generate_content(prompt.text)
@@ -60,6 +47,19 @@ async def auto_generate_shifts(
 ):
     """
     Automatically generate shifts.
+    valid :
+{
+  "employer_id": 1,
+  "start_date": "2025-12-20",
+  "end_date": "2025-12-21",
+  "roles": [
+    "Lifeguard"
+  ],
+  "location": "Erie",
+  "shifts_per_day": 1,
+  "hours_per_shift": 1,
+  "additional_instructions": "shifts."
+}
     """
     
     employees = db.query(Employee).filter(Employee.employer_id == request.employer_id).all()
