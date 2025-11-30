@@ -21,12 +21,12 @@ class Prompt(BaseModel):
 
 class AutoShiftRequest(BaseModel):
     employer_id: int
-    start_date: str  # YYYY-MM-DD format
-    end_date: str    # YYYY-MM-DD format
-    roles: Optional[List[str]] = ["General Staff"]  # roles to schedule
+    start_date: str
+    end_date: str
+    roles: Optional[List[str]] = ["General Staff"]
     location: Optional[str] = None
-    shifts_per_day: Optional[int] = 2  # how many shifts per day
-    hours_per_shift: Optional[int] = 8  # typical shift length
+    shifts_per_day: Optional[int] = 2
+    hours_per_shift: Optional[int] = 8
     additional_instructions: Optional[str] = None
 
 
@@ -34,8 +34,21 @@ class AutoShiftRequest(BaseModel):
 async def generate_text(prompt: Prompt):
     """
     Sends a prompt to Google Gemini and returns the response.
+    valid :
+{
+  "employer_id": 1,
+  "start_date": "2025-12-20",
+  "end_date": "2025-12-21",
+  "roles": [
+    "Lifeguard"
+  ],
+  "location": "Erie",
+  "shifts_per_day": 1,
+  "hours_per_shift": 1,
+  "additional_instructions": "shifts."
+}
     """
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-pro")
     response = model.generate_content(prompt.text)
     return {"response": response.text}
 
@@ -46,15 +59,9 @@ async def auto_generate_shifts(
     db: Session = Depends(get_db)
 ):
     """
-    Automatically generate shifts based on employee availabilities using Gemini AI.
-    
-    Steps:
-    1. Fetch all employee availabilities for the employer
-    2. Send availabilities to Gemini with scheduling instructions
-    3. Parse Gemini's response and create shifts in the database
+    Automatically generate shifts.
     """
     
-    # Step 1: Fetch all employees and their availabilities for this employer
     employees = db.query(Employee).filter(Employee.employer_id == request.employer_id).all()
     
     if not employees:
@@ -63,13 +70,16 @@ async def auto_generate_shifts(
             detail="No employees found for this employer"
         )
     
-    # Gather availability data
     availability_data = []
+    employees_with_availability = []
+    employees_without_availability = []
+    
     for employee in employees:
         availabilities = db.query(EmployeeAvailability).filter(
-            EmployeeAvailability.employee_id == employee.id,
-            EmployeeAvailability.status == "approved"
+            EmployeeAvailability.employee_id == employee.id
         ).all()
+        
+        approved_availabilities = [a for a in availabilities if a.status == "approved"]
         
         employee_info = {
             "employee_id": employee.id,
@@ -77,7 +87,7 @@ async def auto_generate_shifts(
             "availabilities": []
         }
         
-        for avail in availabilities:
+        for avail in approved_availabilities:
             avail_dict = {
                 "type": avail.type.value,
                 "start_date": str(avail.start_date),
@@ -96,14 +106,22 @@ async def auto_generate_shifts(
         
         if employee_info["availabilities"]:
             availability_data.append(employee_info)
+            employees_with_availability.append(employee.first_name + " " + employee.last_name)
+        else:
+            employees_without_availability.append(employee.first_name + " " + employee.last_name)
     
     if not availability_data:
+        detail_message = f"No approved availabilities found. Total employees: {len(employees)}."
+        if employees_without_availability:
+            detail_message += f" Employees without approved availability: {', '.join(employees_without_availability)}."
+        detail_message += " Please ensure employees have submitted and you have approved their availabilities."
+        
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No approved availabilities found for any employees"
+            detail=detail_message
         )
     
-    # Step 2: Create prompt for Gemini
+        
     prompt = f"""
 You are a scheduling assistant. Create an optimal work schedule based on the following employee availabilities.
 
@@ -144,13 +162,14 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
 7. Use 24-hour time format
 """
     
-    # Step 3: Call Gemini API
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-pro")
         response = model.generate_content(prompt)
         response_text = response.text.strip()
         
-        # Clean the response (remove markdown code blocks if present)
+        
+        original_response = response_text
+        
         if response_text.startswith("```json"):
             response_text = response_text[7:]
         if response_text.startswith("```"):
@@ -159,36 +178,39 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
             response_text = response_text[:-3]
         response_text = response_text.strip()
         
-        # Parse JSON response
         shifts_data = json.loads(response_text)
+        
+        if not shifts_data or len(shifts_data) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Gemini returned no shifts. This might be because no employees are available during the requested time period. Original response: {original_response[:1000]}"
+            )
         
     except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to parse Gemini response as JSON: {str(e)}\n\nResponse: {response_text[:500]}"
         )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error calling Gemini API: {str(e)}"
         )
     
-    # Step 4: Create shifts in database
     created_shifts = []
     errors = []
     
     for shift_data in shifts_data:
         try:
-            # Validate required fields
             if not all(k in shift_data for k in ["employee_id", "role", "title", "start_time", "end_time"]):
                 errors.append(f"Missing required fields in shift: {shift_data}")
                 continue
             
-            # Parse datetime strings
             start_time = datetime.strptime(shift_data["start_time"], "%Y-%m-%d %H:%M:%S")
             end_time = datetime.strptime(shift_data["end_time"], "%Y-%m-%d %H:%M:%S")
             
-            # Check for overlapping shifts
             overlapping = db.query(Shift).filter(
                 Shift.employee_id == shift_data["employee_id"],
                 Shift.start_time < end_time,
@@ -199,7 +221,6 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
                 errors.append(f"Overlapping shift for employee {shift_data['employee_id']} at {start_time}")
                 continue
             
-            # Create the shift
             new_shift = Shift(
                 employee_id=shift_data["employee_id"],
                 employer_id=request.employer_id,
@@ -224,7 +245,6 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
         except Exception as e:
             errors.append(f"Error creating shift: {str(e)} - Data: {shift_data}")
     
-    # Commit all shifts
     try:
         db.commit()
     except Exception as e:
@@ -238,5 +258,10 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
         "success": True,
         "shifts_created": len(created_shifts),
         "shifts": created_shifts,
-        "errors": errors if errors else None
+        "errors": errors if errors else None,
+        "debug_info": {
+            "employees_with_availability": employees_with_availability,
+            "total_employees": len(employees),
+            "gemini_response": original_response[:500] if 'original_response' in locals() else None
+        }
     }

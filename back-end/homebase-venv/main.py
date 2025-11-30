@@ -71,7 +71,6 @@ app.include_router(team_router)
 app.include_router(availabilities_router)
 app.include_router(announcements_router)
 app.include_router(gemini_router)
-app.include_router(availabilities_router)  # Fixed typo
 
 # WebSocket connections
 connections: dict[int, List[WebSocket]] = {}
