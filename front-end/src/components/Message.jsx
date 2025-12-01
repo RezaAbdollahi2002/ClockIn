@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { IoCloseSharp } from "react-icons/io5";
@@ -7,7 +7,7 @@ import ExpandableText from "./ExpandableText ";
 
 const BASE_URL = "/api/chat/";
 
-const Message = ({ onClose }) => {
+const Message = ({ onClose,activeBot,setActiveBot }) => {
   const [team, setTeam] = useState([]);
   const [search, setSearch] = useState("");
   const [newMessage, setNewMessage] = useState(false);
@@ -332,7 +332,9 @@ const Message = ({ onClose }) => {
   }
 
 
-
+const handleActiveBot = async ()=>{
+  setActiveBot(!activeBot);
+}
 
 
   // Helper for conversation name
@@ -354,6 +356,9 @@ const Message = ({ onClose }) => {
               <div className="flex  justify-between">
                 <button className="text-xs md:text-sm" onClick={onClose}>
                   <IoCloseSharp className="bg-white w-4 h-4 text-purple-700" />
+                </button>
+                <button className="text-md text-purple-800 font-bold" onClick={()=>handleActiveBot()}>
+                  Bot
                 </button>
 
               </div>

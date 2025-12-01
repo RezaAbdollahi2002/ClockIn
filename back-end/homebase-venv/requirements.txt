@@ -14,3 +14,4 @@ uvicorn
 fastapi-mail
 python-dotenv
 google-generativeai
+

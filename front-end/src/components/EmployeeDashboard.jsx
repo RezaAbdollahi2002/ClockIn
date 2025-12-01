@@ -8,9 +8,10 @@ import Navbar from "./Navbar";
 import EmployeeAnnouncement from "./EmployeeAnnouncement";
 import ElectricBorder from "./Animations/ElectricBorder";
 import Avatar from "../assets/Avatar.webp";
+import ChatBot from "./AI/ChatBot";
 
 
-const EmployeeDashboard = ({ message, setMessage }) => {
+const EmployeeDashboard = ({ message, setMessage, activeBot, setActiveBot }) => {
   const [employeeName, setEmployeeName] = useState("Employee");
   const [profilePic, setProfilePic] = useState(Avatar);
   const employeeId = localStorage.getItem("employee_id");
@@ -84,10 +85,17 @@ const EmployeeDashboard = ({ message, setMessage }) => {
             className={`absolute top-9.5 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
               }`}
           >
-            <Message onClose={() => setMessage(false)} />
+            <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
           </div>
         </>
 
+      }
+      {/* Bot */}
+      {activeBot && (
+        <div className="fixed top-9 left-0 bg-gray-50 border-gray-800 border founded-sm shadow-md max-w-[400px] max-h-[600px] rounded-lg ">
+          <ChatBot  />
+        </div>
+      )
       }
 
 

@@ -7,8 +7,9 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Navbar from "./Navbar";
 import Message from "./Message";
+import ChatBot from "./AI/ChatBot";
 
-const EmployeeSchedule = ({ message, handleMessageState, setMessage }) => {
+const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -123,20 +124,20 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage }) => {
 
                   {/* Shift details */}
                   {
-                  visible && (
-                  <>
-                    <div className="flex gap-x-2  " >
-                      <span className="truncate  font-bold text-xs">{role}</span>
-                      <span className="truncate text-xs font-bold hidden lg:block">
-                        {shift}
-                      </span>
-                      <span className="truncate text-xs font-bold hidden lg:block">
-                        {location}
-                      </span>
-                    </div>
-                  </>
-                  )
-                }
+                    visible && (
+                      <>
+                        <div className="flex gap-x-2  " >
+                          <span className="truncate  font-bold text-xs">{role}</span>
+                          <span className="truncate text-xs font-bold hidden lg:block">
+                            {shift}
+                          </span>
+                          <span className="truncate text-xs font-bold hidden lg:block">
+                            {location}
+                          </span>
+                        </div>
+                      </>
+                    )
+                  }
                 </div>
               );
             }}
@@ -149,8 +150,16 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage }) => {
         className={`absolute top-10 min-h-screen h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-500 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
           }`}
       >
-        <Message onClose={() => setMessage(false)} />
+        <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
       </div>
+
+      {/* Bot */}
+      {activeBot && (
+        <div className="fixed z-50 top-9 left-0 bg-gray-50 border border-gray-800 rounded-sm shadow-md max-w-[400px] max-h-[600px]">
+          <ChatBot />
+        </div>
+      )}
+
     </div>
   );
 };

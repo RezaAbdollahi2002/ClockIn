@@ -5,11 +5,11 @@ import { FaHireAHelper } from "react-icons/fa";
 import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom';
+import ChatBot from '../AI/ChatBot';
 
 
 
-
-const EmployeeRequestsMain = ({ message, setMessage }) => {
+const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) => {
 
   const [shifts, setShifts] = useState([]);
   const [shiftIdCover, setShiftIdCover] = useState(NaN);
@@ -265,11 +265,18 @@ const EmployeeRequestsMain = ({ message, setMessage }) => {
             className={`absolute top-10 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
               }`}
           >
-            <Message onClose={() => setMessage(false)} />
+            <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
           </div>
         </>
 
       }
+      {/* Bot */}
+      {activeBot && (
+        <div className="fixed top-9 left-0 z-50 bg-gray-50 border border-gray-800 rounded-sm shadow-md max-w-[400px] max-h-[600px]">
+          <ChatBot />
+        </div>
+      )}
+
     </div>
   )
 }
