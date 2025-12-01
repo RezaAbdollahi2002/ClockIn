@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Message from './Message';
+import ChatBot from './AI/ChatBot';
 
-const EmployeeSettingsLayout = ({message, handleMessageState, setMessage}) => {
+const EmployeeSettingsLayout = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -19,7 +20,7 @@ const EmployeeSettingsLayout = ({message, handleMessageState, setMessage}) => {
 
   return (
     <>
-      <Navbar messageState={handleMessageState}/>
+      <Navbar messageState={handleMessageState} />
       <div className="h-screen lg:flex">
         {/* Sidebar for large screens */}
         <div className="hidden lg:block  bg-gray-100 p-4 border-r ">
@@ -29,11 +30,10 @@ const EmployeeSettingsLayout = ({message, handleMessageState, setMessage}) => {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className={`block p-2 rounded ${
-                    location.pathname.includes(link.to)
+                  className={`block p-2 rounded ${location.pathname.includes(link.to)
                       ? 'bg-purple-200 text-purple-900 font-semibold'
                       : 'text-gray-900 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -68,9 +68,8 @@ const EmployeeSettingsLayout = ({message, handleMessageState, setMessage}) => {
                   <Link
                     to={link.to}
                     onClick={() => setDropdownOpen(false)}
-                    className={`block p-2 hover:bg-purple-200 ${
-                      location.pathname.includes(link.to) ? 'bg-purple-200 font-semibold text-purple-900' : 'text-gray-900'
-                    }`}
+                    className={`block p-2 hover:bg-purple-200 ${location.pathname.includes(link.to) ? 'bg-purple-200 font-semibold text-purple-900' : 'text-gray-900'
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -86,11 +85,17 @@ const EmployeeSettingsLayout = ({message, handleMessageState, setMessage}) => {
         </div>
 
         {/* Message System */}
-        <div className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${
-          message ? "translate-x-0" : "translate-x-full"
-        }`}>
-          <Message onClose={() => setMessage(false)}/>
+        <div className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+          }`}>
+          <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
         </div>
+        {/* Bot */}
+        {activeBot && (
+          <div className="fixed top-9 left-0 z-50 bg-gray-50 border border-gray-800 rounded-sm shadow-md max-w-[400px] max-h-[600px]">
+            <ChatBot />
+          </div>
+        )}
+
       </div>
     </>
   );

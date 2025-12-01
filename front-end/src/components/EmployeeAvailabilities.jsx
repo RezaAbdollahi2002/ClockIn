@@ -6,8 +6,9 @@ import { FaPlus } from "react-icons/fa";
 import Message from "./Message";
 import Navbar from "./Navbar";
 import axios from "axios";
+import ChatBot from "./AI/ChatBot";
 
-const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => {
+const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activeBot,setActiveBot }) => {
     const [newAvailability, setNewAvailability] = useState(false);
     const [clearAvailability, setClearAvailability] = useState(false);
     const [modifyAvailability, setModifyAvailability] = useState(false);
@@ -180,18 +181,18 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
     }
 
     // 🔹 Convert input value -> format backend accepts, e.g. "23:50:17.614Z"
-   const toBackendTime = (val) => {
-    if (!val) return null;
+    const toBackendTime = (val) => {
+        if (!val) return null;
 
-    const date = new Date(val); // the local datetime you selected
+        const date = new Date(val); // the local datetime you selected
 
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = "00";
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = "00";
 
-    // return pure LOCAL TIME (no Z)
-    return `${hours}:${minutes}:${seconds}`;
-};
+        // return pure LOCAL TIME (no Z)
+        return `${hours}:${minutes}:${seconds}`;
+    };
 
     const handleHoursSubmit = async (e) => {
         e.preventDefault();
@@ -794,7 +795,7 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
                                         <div className="text-gray-700 text-sm mb-1 hover:text-red-600 hover:font-semibold hover:text-medium" onClick={() => setShowMyAvailabilities(false)}>
                                             x
                                         </div>
-                                        <div  className="border-black border-2 px-2 py-1 rounded-sm shadow-2xl  hover:cursor-cell mb-1"
+                                        <div className="border-black border-2 px-2 py-1 rounded-sm shadow-2xl  hover:cursor-cell mb-1"
                                             onClick={() => handleAvailabilityId(av.id)}>
                                             <div className="flex gap-x-3 justify-start text-sm my-2">
                                                 <button
@@ -847,7 +848,7 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
                                 ))
                             }
                         </div>
-                    ) 
+                    )
                 }
                 {
                     addHours ? (
@@ -1098,9 +1099,16 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage }) => 
                     className={`absolute min-h-screen -top-5 bottom-0  h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
                         }`}
                 >
-                    <Message onClose={() => setMessage(false)} />
+                    <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
                 </div>
             </div>
+            {/* Bot */}
+            {activeBot && (
+                <div className="fixed top-9 left-0 z-50 bg-gray-50 border border-gray-800 rounded-sm shadow-md max-w-[400px] max-h-[600px]">
+                    <ChatBot />
+                </div>
+            )}
+
         </div>
     );
 };

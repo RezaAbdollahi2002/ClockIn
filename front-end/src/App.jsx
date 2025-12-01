@@ -23,6 +23,7 @@ import EmployeeRequestsMain from '../src/components/Requests/EmployeeRequestsMai
 
 const App = () => {
   const [message, setMessage] = useState(false);
+  const [activeBot, setActiveBot] = useState(false);
   const handleMessageState = (data) => setMessage(data);
 
   return (
@@ -114,7 +115,7 @@ const App = () => {
           element={
             <>
               <Navbar messageState={handleMessageState} />
-              <EmployeeDashboard message={message} setMessage={setMessage} />
+              <EmployeeDashboard message={message} setMessage={setMessage} activeBot={activeBot} setActiveBot={setActiveBot} />
             </>
           }
         />
@@ -123,7 +124,7 @@ const App = () => {
           element={
             <>
               <Navbar messageState={handleMessageState} />
-              <EmployeeRequestsMain message={message} setMessage={setMessage} />
+              <EmployeeRequestsMain message={message} setMessage={setMessage} activeBot={activeBot} setActiveBot={setActiveBot} />
             </>
           }
         />
@@ -136,6 +137,8 @@ const App = () => {
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
+              activeBot={activeBot}
+              setActiveBot={setActiveBot}
             />
           }
         >
@@ -151,10 +154,10 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-settings'
-          element={<EmployerSettings  
+          element={<EmployerSettings
             message={message}
-              handleMessageState={handleMessageState}
-              setMessage={setMessage}/>}
+            handleMessageState={handleMessageState}
+            setMessage={setMessage} />}
         >
           <Route index element={<EmployerProfile />} />
           <Route
@@ -182,10 +185,12 @@ const App = () => {
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
+              activeBot={activeBot}
+              setActiveBot={setActiveBot}
             />
           }
         />
-        <Route path='/onboarding/sign-up/message' element={<Message />} />
+        <Route path='/onboarding/sign-up/message' element={<Message activeBot={activeBot} setActiveBot={setActiveBot} />} />
         <Route
           path='/onboarding/Schedule'
           element={
@@ -193,6 +198,8 @@ const App = () => {
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
+              activeBot={activeBot}
+              setActiveBot={setActiveBot}
             />
           }
         />
@@ -203,6 +210,8 @@ const App = () => {
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
+              activeBot={activeBot}
+              setActiveBot={setActiveBot}
             />
           }
         />
