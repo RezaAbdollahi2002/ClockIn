@@ -27,6 +27,7 @@ class AutoShiftRequest(BaseModel):
     location: Optional[str] = None
     shifts_per_day: Optional[int] = 2
     hours_per_shift: Optional[int] = 8
+    employees_per_shift: Optional[int] = 1  # number of employees per shift time slot
     additional_instructions: Optional[str] = None
 
 
@@ -58,7 +59,8 @@ async def auto_generate_shifts(
   "location": "Erie",
   "shifts_per_day": 1,
   "hours_per_shift": 1,
-  "additional_instructions": "shifts."
+  "employees_per_shift": 3,
+  "additional_instructions": "Schedule 3 lifeguards per shift for safety."
 }
     """
     
@@ -132,6 +134,7 @@ You are a scheduling assistant. Create an optimal work schedule based on the fol
 - Location: {request.location or 'Default Location'}
 - Shifts per day: {request.shifts_per_day}
 - Hours per shift: {request.hours_per_shift}
+- Employees per shift: {request.employees_per_shift}
 
 **Employee Availabilities:**
 {json.dumps(availability_data, indent=2)}
@@ -155,11 +158,13 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
 **Important Rules:**
 1. Only schedule employees during their available times
 2. Respect the type field - do not schedule during "unavailable" periods
-3. No overlapping shifts for the same employee
-4. Create shifts within the date range provided
-5. Return ONLY the JSON array, no additional text or markdown
-6. Ensure all times are within employee availability windows
-7. Use 24-hour time format
+3. Multiple employees CAN have shifts at the same time (overlapping shifts for different employees is allowed)
+4. No overlapping shifts for the SAME employee
+5. Create {request.employees_per_shift} employees per shift time slot when possible
+6. Create shifts within the date range provided
+7. Return ONLY the JSON array, no additional text or markdown
+8. Ensure all times are within employee availability windows
+9. Use 24-hour time format
 """
     
     try:
