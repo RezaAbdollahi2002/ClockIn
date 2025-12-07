@@ -511,16 +511,17 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activ
     const events = buildEventsFromAvailabilities(availabilityView);
 
     return (
-        <div className="relative max-h-screen">
-            <Navbar messageState={handleMessageState} />
-            <h1 className="md:text-3xl text-lg text-center mt-15 font-bold ">Availability</h1>
-            <div className="w-full min-h-screen p-3 px-2 shadow-lg border-gray-800 rounded-lg">
+        <div className="bg-gray-800 -mt-4 py-2">
+<div className=" max-h-screen max-w-[1200px] mx-auto bg-white -mt-3 shadow-2xl shadow-white ">
+                            <h1 className="md:text-3xl text-lg text-center mt-15 font-bold  text-purple-800">Availability</h1>
+
+            <div className="w-full h-screen p-3 px-2 shadow-lg border-gray-800 rounded-lg">
                 <div className="flex gap-x-3 px-8 py-10 ">
                     <div className="-mt-6">
                         <ul className="flex gap-6 ">
                             <li>
                                 <button
-                                    className="px-2 py-1 text-sm md:text-medium font-semibold border border-gray-400 rounded-sm shadow-sm bg-white hover:scale-105 duration:300 cursor-pointer"
+                                    className="px-2 py-1 text-sm md:text-medium font-semibold border border-gray-400 rounded-sm shadow-sm bg-white hover:scale-105 duration:300 cursor-pointer hover:bg-amber-200 duration:200"
                                     onClick={handleOpenNew}
                                 >
                                     New
@@ -537,11 +538,11 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activ
                 </div>
 
                 {/* Show the availabilities */}
-                <div className="border-t py-2  mx-8 px-2 bg-white -mt-4 h-[600px] shadow-lg  ">
+                <div className="border-t py-2  mx-8 px-2 bg-white -mt-4 h-[840px] overflow-y-auto shadow-lg  ">
                         <FullCalendar
                             plugins={[timeGridPlugin]}
                             initialView="timeGridWeek"
-                            height="100%"
+                            height="auto"
                             weekends={true}
                             events={events}
                             titleFormat={{
@@ -1095,13 +1096,19 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activ
                 }
 
 
-
-                <div
-                    className={`absolute min-h-screen -top-5 bottom-0  h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+                {
+                    message &&(
+                        <>
+                        <div
+                    className={`absolute h-screen top-10 bottom-0   right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
                         }`}
                 >
                     <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
                 </div>
+                        </>
+                    )
+                }
+                
             </div>
             {/* Bot */}
             {activeBot && (
@@ -1111,6 +1118,8 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activ
             )}
 
         </div>
+        </div>
+        
     );
 };
 

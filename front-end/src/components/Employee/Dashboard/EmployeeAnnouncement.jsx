@@ -1,5 +1,5 @@
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
 
 const EmployeeAnnouncement = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -27,7 +27,7 @@ const EmployeeAnnouncement = () => {
   }, [employeeId]);
 
   return (
-    <div className="bg-transparent p-4 h-full text-lack">
+    <div className="bg-transparent p-4 h-[100%] text-lack">
       {announcements.length === 0 ? (
         <p className="text-red">No announcements found</p>
       ) : (

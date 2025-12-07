@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { Typewriter } from "react-simple-typewriter";
-import UserSignup from "./UserSignup";
+import {useSignup} from "./EmployeeSignupContext"
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
@@ -106,11 +106,13 @@ const UserContactInfoSignup = () => {
     }
   };
 
+  // bg-gradient-to-br from-[#9480b3] via-[#30293a] to-[#D473FF]
+
   return (
-    <div className="min-h-screen w-full px-4 md:px-10 py-12 bg-gradient-to-br from-[#9480b3] via-[#30293a] to-[#D473FF]">
+    <div className="min-h-screen w-full px-4 md:px-10 py-12 bg-purple-950">
       <h1 className="hidden lg:block text-xl md:text-3xl xl:text-4xl text-white font-semibold mb-6">
         <Typewriter
-          words={["homebase", "Homebase"]}
+          words={["ClockIn", "ClockIn"]}
           loop
           cursor
           cursorStyle="_"

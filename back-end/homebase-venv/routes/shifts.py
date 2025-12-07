@@ -106,7 +106,46 @@ def get_shifts(employer_id:int, published: bool, db: Session = Depends(get_db)):
             } if shift.employee else None
         })
     return result
+@router.get("/shifts/request")
+def get_shifts(employee_id: int, db: Session = Depends(get_db)):
+    # Fix 1: use employer_id properly if you mean employer or employee
+    shifts = (
+        db.query(Shift)
+        .filter(
+            Shift.employee_id == employee_id,
+            Shift.publish_status == "published"
+        )
+        .order_by(Shift.id.desc())   # Fix 2: correct order_by usage
+        .all()
+    )
 
+    # Fix 3: check shifts (not shift)
+    if not shifts:
+        raise HTTPException(status_code=404, detail="No shifts available")
+
+    # Convert to dicts
+    result = []
+    for shift in shifts:
+        result.append({
+            "id": shift.id,
+            "employee_id": shift.employee_id,
+            "employer_id": shift.employer_id,
+            "role": shift.role,
+            "location": shift.location,
+            "title": shift.title,
+            "description": shift.description,
+            "start_time": shift.start_time,
+            "end_time": shift.end_time,
+            "status": shift.status.value if shift.status else None,
+            "publish_status": shift.publish_status.value if shift.publish_status else None,
+            "employee": {
+                "id": shift.employee.id if shift.employee else None,
+                "first_name": shift.employee.first_name if shift.employee else "",
+                "last_name": shift.employee.last_name if shift.employee else "",
+                "profile_picture": shift.employee.profile_picture if shift.employee else None,
+            } if shift.employee else None,
+        })
+    return result
 
 @router.get("/shifts/employee")
 def get_shifts(employee_id:int, db: Session = Depends(get_db)):
@@ -500,21 +539,54 @@ def update_shift_chat(
     return shift
 
 
+# @router.post("/shifts/{shift_id}/cover-request")
+# def request_shift_cover(shift_id: int, requester_id: int, db: Session = Depends(get_db)):
+#     shift = db.query(Shift).filter(Shift.id == shift_id).first()
+#     if not shift:
+#         return {"error": "Shift not found"}
+#     if shift.
+
+#     cover_request = ShiftCoverRequest(
+#         shift_id=shift.id,
+#         requester_id=requester_id,
+#         status=RequestStatus.pending
+#     )
+#     db.add(cover_request)
+#     db.commit()
+#     db.refresh(cover_request)
+#     return cover_request
+
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
+
 @router.post("/shifts/{shift_id}/cover-request")
-def request_shift_cover(shift_id: int, requester_id: int, db: Session = Depends(get_db)):
+def request_shift_cover(
+    shift_id: int,
+    requester_id: int,
+    db: Session = Depends(get_db),
+):
     shift = db.query(Shift).filter(Shift.id == shift_id).first()
     if not shift:
-        return {"error": "Shift not found"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Shift not found",
+        )
 
+    
+
+    # 2️⃣ If no active request exists, create a new one
     cover_request = ShiftCoverRequest(
         shift_id=shift.id,
         requester_id=requester_id,
-        status=RequestStatus.pending
+        status=RequestStatus.pending,
     )
+
     db.add(cover_request)
     db.commit()
     db.refresh(cover_request)
     return cover_request
+
 
 @router.put("/shifts/cover-request/{request_id}/respond")
 def respond_cover_request(request_id: int, responder_id: int, accept: bool, db: Session = Depends(get_db)):

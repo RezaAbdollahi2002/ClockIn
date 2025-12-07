@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import UserSignup from "../../Employee/Registration/UserSignup";
+import { useSignup } from "../../Employee/Registration/EmployeeSignupContext";
 import axios from "axios";
 
 const OwnerSignupForm = () => {

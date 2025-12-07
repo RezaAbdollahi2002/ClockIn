@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { SignupProvider } from './components/employeeSettings/EmployeeSignupContext.jsx';
+import { SignupProvider } from './components/Employee/Registration/EmployeeSignupContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

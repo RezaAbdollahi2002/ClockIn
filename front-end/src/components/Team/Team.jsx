@@ -36,7 +36,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
 
 
   return (
-    <div className="min-h-screen bg-[#E5E5E5] pt-0 py-6 relative overflow-x-auto -mt-10">
+    <div className="max-h-screen bg-[#E5E5E5] pt-0  h-screen  -mt-10">
       <div className="min-w-[600px]">
         {/* Navbar */}
         {isEmployee ? (
@@ -76,7 +76,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
             </div>
 
             {/* Team members */}
-            <div className="overflow-auto max-h-[70vh]">
+            <div className="overflow-auto max-h-screen">
               {filteredMembers.length > 0 ? (
                 filteredMembers.map((member) => (
                   <div
@@ -109,12 +109,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
         </div>
 
         {/* Sliding message panel */}
-        <div
-          className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
-            }`}
-        >
-          <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
-        </div>
+       
       </div>
       {/* Bot */}
       {activeBot && (
@@ -122,7 +117,21 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
           <ChatBot />
         </div>
       )}
+       {
+          message && (
+            <>
+             <div
+          className={`absolute top-9.5  right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            }`}
+        >
+          <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
+        </div>
+            </>
+          )
+        }
+       
     </div>
+    
   );
 
 };

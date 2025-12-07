@@ -2,6 +2,7 @@ import UserSignup from "./UserSignup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState, useCallback } from "react";
+import { useSignup } from "./EmployeeSignupContext";
 
 const mapSignupDataToBackend = (data) => ({
   first_name: data.firstName,
@@ -41,7 +42,7 @@ const UserCheckingAccountInfo = () => {
 
     try {
       const payload = mapSignupDataToBackend(signupData);
-      const response = await axios.post("/api/employee-signup", payload);
+      await axios.post("/api/employee-signup", payload);
       navigate("/accounts/sign-in");
     } catch (error) {
       const message = error.response?.data?.detail || "Signup failed. Please check your input and try again.";

@@ -11,7 +11,7 @@ const Singup = () => {
         <div className='grid grid-cols-1 min-h-screen items-center   md:grid-cols-2   '>
             {/* Left */}
             <div className=' min-h-screen flex flex-col   px-6 py-8  bg-white'>
-                <h1 className='font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-purple-700 mb-4 '>homebase</h1>
+                <h1 className='font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-purple-700 mb-4 '>ClockIn</h1>
                 <div className='flex flex-col justify-center items-center px-6 py-10 text-center my-auto'>
                     <h1 className='text-black font-bold text-xl md:text-2xl lg:text-3xl xl:text-5xl mb-4'>Let’s Make Work Easier.</h1>
                     <p className='text-purple-700 text-lg mt-2  md:text-xl lg:text-2xl xl:text-3xl'>

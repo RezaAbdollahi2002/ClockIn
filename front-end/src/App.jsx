@@ -1,19 +1,19 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { useState } from 'react';
 import {
-  Register, AccountRecovery, SignInPhoneNumber, Singup,
-  OwnerSignup, OwnerMotivation, BusinessInfoOwnerSignUp, CreateOwnerAccount,
+  Register, AccountRecovery, SignInPhoneNumber, Singup, OwnerMotivation, BusinessInfoOwnerSignUp, CreateOwnerAccount,
   SignupEmployee, UserSignup, UserContactInfoSignup, UserAccountinfo,
   UserCheckingAccountInfo, EmployeeDashboard, FinalizeOwnerAccount, EmployeeSettings,
   Team, Message, EmployerProfile, EmployerSettings, EmployeeSchedule, EmployerSchedule,
   EmployerNavbar, EmployeeAvailabilities,
   Navbar
-} from '.';
+} from './index';
+import OwnerSignup from "./components/Employer/Registration/OwnerSignup"
 import HomePage from './components/Homepage/HomePage';
-import Profile from './components/employeeSettings/Profile';
-import PasswordAndSecurity from './components/employeeSettings/PasswordAndSecurity';
-import Notifications from './components/employeeSettings/Notifications';
-import LocationsAndPINs from './components/employeeSettings/LocationsAndPINs';
+import Profile from './components/Employee/Settings/Profile';
+import PasswordAndSecurity from './components/Employee/Settings/PasswordAndSecurity';
+import Notifications from './components/Employee/Settings/Notifications';
+import LocationsAndPINs from './components/Employee/Settings/LocationsAndPINs';
 import EmployerLocationsAndPINs from './components/Employer/EmployerLocationsAndPINs';
 import EmployerasswordAndSecurity from './components/Employer/Settings/EmployerasswordAndSecurity';
 import EmployerNotifications from './components/Employer/Settings/EmployerNotifications';
@@ -200,25 +200,33 @@ const App = () => {
         <Route
           path='/onboarding/Schedule'
           element={
+            <>
+            <Navbar messageState={handleMessageState}/>
             <EmployeeSchedule
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
               activeBot={activeBot}
               setActiveBot={setActiveBot}
-            />
+            /> 
+            </>
+           
           }
         />
         <Route
           path='/onboarding/My_Availabilities'
           element={
-            <EmployeeAvailabilities
+            <>
+                        <Navbar messageState={handleMessageState} />
+<EmployeeAvailabilities
               message={message}
               handleMessageState={handleMessageState}
               setMessage={setMessage}
               activeBot={activeBot}
               setActiveBot={setActiveBot}
             />
+            </>
+            
           }
         />
       </Routes>

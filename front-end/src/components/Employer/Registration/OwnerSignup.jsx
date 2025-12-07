@@ -13,12 +13,12 @@ const OwnerSignup = () => {
             <div className='md:flex md:flex-col justify-between px-6 py-10 min-h-screen'>
                 {/* Top Navbar */}
                 <div className='flex justify-between items-center mb-8'>
-                    <h1 className='hidden md:inline text-purple-700 text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold'>homebase</h1>
+                    <h1 className='hidden md:inline text-purple-700 text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold'>ClockIn</h1>
 
                 </div>
                 <div className='flex flex-col gap-y-4 justify-center max-w-[600px] items-center   md:my-auto md:mx-auto'>
                     <p>STEP 1 OF 4</p>
-                    <h1 className='text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold '>Welcome to Homebase!</h1>
+                    <h1 className='text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold '>Welcome to ClockIn!</h1>
                     <p className='text-gray-700'><span className='text-gray-900'>Join thousands of businesses near you</span> already running on Homebase. No credit card required, 14-day free trial. <span className='text-xs md:text-sm text-right ml-2 py-4'>
                     Have an account?{' '}
                     <span className='text-purple-700 underline hover:no-underline hover:scale-102 duration-75'>

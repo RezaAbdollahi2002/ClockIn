@@ -68,17 +68,16 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, 
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="relative min-w-[700px] max-w-full overflow-x-auto max-h-screen ">
+    <div className="bg-gray-800 h-screen">
+ <div className=" min-w-[700px] max-w-full overflow-y-auto max-h-screen md:max-w-[1200px] mx-auto bg-white h-full shadow-2xl rounded-lg shadow-white border-r border-l border-blue-600 border-2 ">
       {/* Navbar */}
-      <Navbar messageState={handleMessageState} />
-      <div className="w-full h-auto flex justify-center mt-12 ">
-        <h1 className="font-bold md:text-2xl text-medium">Schedule</h1>
+      <div className="w-full  flex justify-center mt-12 ">
+        <h1 className="font-bold md:text-2xl text-medium text-purple-800 ">Schedule</h1>
       </div>
 
-      {/* Calendar + List */}
-      <div className="p-4 w-full flex justify-center " >
+      <div className="p-4 w-full flex justify-center  h-full " >
         {/* Right panel: calendar */}
-        <div className="w-full ">
+        <div className="w-full max-h-[800px] md:max-w-[1200px]">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
@@ -89,20 +88,26 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, 
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay"
             }}
+            slotEventOverlap={false}
+              eventMaxStack={4}
+              dayMaxEvents={4}
+              eventClassNames="shadow-md"
+              dayCellClassNames="hover:bg-blue-50"
+              viewClassNames="border-gray-800"
             eventContent={(arg) => {
               const {
                 role,
-                shift,
+                // shift,
                 location,
                 profilePicture,
                 firstName,
                 lastName,
               } = arg.event.extendedProps;
 
-              const fullName = `${firstName || ""} ${lastName || ""}`.trim();
+              const fullName = `${firstName || ""} ${lastName?.[0] || ""}`.trim();
 
               return (
-                <div className="flex items-center  gap-2 px-1 py-1 rounded-lg text-white text-xs font-bold overflow-hidden bg-[#1e90ff] w-full " >
+                <div className="flex flex-col items-center  gap-2 px-1 py-1 rounded-lg text-white text-xs font-bold overflow-hidden bg-[#1e90ff] w-full " onClick={()=> setVisible(!visible)} >
                   {/* Avatar + name */}
                   <div className={`flex items-center gap-1 min-w-[80px]  ${visible && "flex justify-around "}`} >
                     {profilePicture ? (
@@ -112,7 +117,7 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, 
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-6 h-6 rounded-full bg-blue-900 flex items-center justify-center text-medium md:text-lg font-bold flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-blue-900 flex items-center justify-center text-sm md:text-md  font-semibold flex-shrink-0">
                         {firstName ? firstName[0] : "?"}
                       </div>
                     )}
@@ -125,14 +130,13 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, 
                   {
                     visible && (
                       <>
-                        <div className="flex gap-x-2  " >
-                          <span className="truncate  font-bold text-xs">{role}</span>
-                          <span className="truncate text-xs font-bold hidden lg:block">
-                            {shift}
-                          </span>
-                          <span className="truncate text-xs font-bold hidden lg:block">
+                        <div className="flex flex-col gap-y-2  " >
+                          <p className="text-md font-bold">Role <span className="truncate  font-bold text-xs">{role}</span></p>
+                          <p className="flex gap-x-1">
+                            Location <span className="truncate text-xs font-bold hidden lg:block">
                             {location}
                           </span>
+                          </p>
                         </div>
                       </>
                     )
@@ -143,14 +147,19 @@ const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, 
           />
         </div>
       </div>
+    </div>
+
 
       {/* Chat Drawer */}
-      <div
+      {message && (
+        <div
         className={`absolute top-10 min-h-screen h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-500 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
-      </div>
+      </div> 
+      )
+      }
 
       {/* Bot */}
       {activeBot && (

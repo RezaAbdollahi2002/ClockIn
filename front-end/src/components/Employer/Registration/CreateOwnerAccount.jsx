@@ -1,4 +1,4 @@
-import { useSignup } from "../../employeeSettings/EmployeeSignupContext";
+import { useSignup } from "../../Employee/Registration/EmployeeSignupContext";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";

@@ -5,7 +5,6 @@ const EmployeeShiftsDashboard = ({ employee_id }) => {
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [Announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     if (!employee_id) return;
@@ -15,7 +14,7 @@ const EmployeeShiftsDashboard = ({ employee_id }) => {
     console.log(employee_id)
 
     axios
-      .get("/api/employee/shifts-dashboard", { params: { employee_id } })
+      .get("/api/shifts/request", { params: { employee_id } })
       .then((res) => {
         console.log("res.data:", res.data);
         console.log("Array.isArray(res.data)?", Array.isArray(res.data));
@@ -47,7 +46,9 @@ const EmployeeShiftsDashboard = ({ employee_id }) => {
           !error &&
           shifts.map((shift, index) => (
             <>
-              <div className="bg-[#EBF0F0] px-2 py-2 rounded-md hover:bg-[#CFD2D2] duration-75 ">
+              <div
+              key={index}
+               className="bg-[#EBF0F0] px-2 py-2 rounded-md hover:bg-[#CFD2D2] duration-75 ">
                 <div className="flex-col  md:flex  gap-x-1  ">
                   <div className="flex gap-1">
                     <h3 className="font-bold text-medium md:text-lg text-purple-800 ">Role:</h3>

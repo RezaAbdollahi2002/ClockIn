@@ -47,10 +47,11 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
     if (!employeeId) return;
     const getEmployeeShifts = async () => {
       try {
-        const res = await axios.get(`/api/employee/shifts-dashboard`, { params: { "employee_id": employeeId } });
+        const res = await axios.get(`/api/shifts/request`, { params: { "employee_id": employeeId } });
         setShifts(res.data);
         console.log("Employee id in EmployeeRequestsMain: ", employeeId);
         console.log("shifts:", res.data);
+        
       } catch (err) {
         console.error(err);
       }
@@ -66,6 +67,8 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
       refresh();
     } catch (err) {
       console.error("Error requesting cover:", err);
+      alert("It has already been requested!");
+      console.log(id);
       console.log("Server response:", err.response?.data);
     }
   }
@@ -144,7 +147,8 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
   };
 
   return (
-    <div className='mt-10 px-10 py-5 lg:mx-60'>
+    <div className='bg-gray-800 '>
+  <div className='mt-9 px-10 py-5 lg:mx-60 bg-white h-screen max-h-screen shadow-2xl shadow-white' >
       {/* Top */}
       <div >
         <div className='flex justify-center gap-x-3'>
@@ -162,33 +166,58 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
           {/* body */}
           <div className='max-h-[600px] overflow-y-auto space-y-3  border-gray-300 mx-3 '>
             {
-              shifts.map((shift, key) => (
-                <div
-                  key={key}
-                  className='border-2 px-2 py-1 rounded-md border-gray-300 shadow-sm text-sm md:text-md '>
-                  <div className='md:grid md:grid-cols-2 flex flex-col gap-y-3 '>
-                    <div className='flex flex-col gap-y-3'>
-                      <h1 className='text-purple-800 font-semibold text-sm'>Title <span className='text-gray-800 text-xs font:md'>{shift.title}</span></h1>
-                      <h1 className='text-purple-800 font-semibold text-sm'>Role <span className='text-gray-800 text-xs font:md'>{shift.role}</span></h1>
-                      <h1 className='text-purple-800 font-semibold text-sm'>Location <span className='text-gray-800 text-xs font:md'>{shift.location}</span></h1>
-                      <h1 className='text-purple-800 font-semibold text-sm' >Description <span className='text-gray-800 text-xs font:md'>{shift.description}</span></h1>
-                    </div>
-                    <div className='flex flex-col gap-y-3'>
-                      <h1 className='text-purple-800 font-semibold text-sm md:text-md ' >Start Time <span className='text-gray-800 text-xs font:md'>{formatDateTime(shift.start_time)}</span></h1>
-                      <h1 className='text-purple-800 font-semibold text-sm md:text:md'>End Time <span className='text-gray-800 text-xs font:md'>{formatDateTime(shift.end_time)}</span></h1>
-                    </div>
-                  </div>
+  shifts.length > 0 ? (
+    shifts.map((shift, key) => (
+      <div
+        key={key}
+        className="border-2 px-2 py-1 rounded-md border-gray-300 shadow-sm text-sm md:text-md"
+      >
+        <div className="md:grid md:grid-cols-2 flex flex-col gap-y-3">
+          <div className="flex flex-col gap-y-3">
+            <h1 className="text-purple-800 font-semibold text-sm">
+              Title <span className="text-gray-800 text-xs font:md">{shift.title}</span>
+            </h1>
+            <h1 className="text-purple-800 font-semibold text-sm">
+              Role <span className="text-gray-800 text-xs font:md">{shift.role}</span>
+            </h1>
+            <h1 className="text-purple-800 font-semibold text-sm">
+              Location <span className="text-gray-800 text-xs font:md">{shift.location}</span>
+            </h1>
+            <h1 className="text-purple-800 font-semibold text-sm">
+              Description{" "}
+              <span className="text-gray-800 text-xs font:md">{shift.description}</span>
+            </h1>
+          </div>
 
-                  <button
-                    onClick={() => handleRequestCover(shift.id)}
-                    className='text-gray-700 bg-purple-300  border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800  text-center w-full'>
-                    Request Trade
-                  </button>
+          <div className="flex flex-col gap-y-3">
+            <h1 className="text-purple-800 font-semibold text-sm md:text-md">
+              Start Time{" "}
+              <span className="text-gray-800 text-xs font:md">
+                {formatDateTime(shift.start_time)}
+              </span>
+            </h1>
+            <h1 className="text-purple-800 font-semibold text-sm md:text-md">
+              End Time{" "}
+              <span className="text-gray-800 text-xs font:md">
+                {formatDateTime(shift.end_time)}
+              </span>
+            </h1>
+          </div>
+        </div>
 
-                </div>
+        <button
+          onClick={() => handleRequestCover(shift.id)}
+          className="text-gray-700 bg-purple-300 border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800 text-center w-full"
+        >
+          Request Trade
+        </button>
+      </div>
+    ))
+  ) : (
+    <h1 className="text-red-600 text-sm">No Shifts Available</h1>
+  )
+}
 
-              ))
-            }
           </div>
         </div>
 
@@ -247,17 +276,20 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
           </div>
         </div>
       </div>
-      {
-        <>
+
+    </div>
+  
+      { message &&(
+ <>
 
           <div
-            className={`absolute top-10 bottom-0 min-h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            className={`absolute top-10 bottom-0 h-screen right-0 h-[calc(100%-4rem)] w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-1000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
               }`}
           >
             <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
           </div>
         </>
-
+      )
       }
       {/* Bot */}
       {activeBot && (

@@ -1,14 +1,14 @@
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Typewriter } from "react-simple-typewriter";
 import { useNavigate } from "react-router-dom";
-import { useSignup } from "../../employeeSettings/EmployeeSignupContext";
+import { useSignup } from "./EmployeeSignupContext";
 
 const UserAccountinfo = () => {
   const { signupData, updateSignupData } = useSignup();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -26,6 +26,14 @@ const UserAccountinfo = () => {
   });
 
   const onSubmit = (data) => {
+     if (data.password !== data.confirmPassword) {
+      // ✅ This is the correct way to use setError
+      setError("confirmPassword", {
+        type: "manual",
+        message: "Passwords do not match",
+      });
+      return;
+    }
     // Only send userName and password, exclude confirmPassword
     updateSignupData({
       userName: data.userName,
@@ -96,7 +104,8 @@ const UserAccountinfo = () => {
                   return data.exists
                     ? "Username is already taken"
                     : true;
-                } catch (error) {
+                // eslint-disable-next-line no-unused-vars
+                } catch (err) {
                   return "Failed to validate username availability";
                 }
               },
