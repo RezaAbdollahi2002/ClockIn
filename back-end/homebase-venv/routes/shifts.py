@@ -40,10 +40,11 @@ def create_shift(
 @router.put("/shifts/{shift_id}/edit")
 def edit_shift(
     shift_id: int,
-    employee_id: int = Query(..., description="ID of the employee"),  # required
+    employee_id: int = Query(..., description="ID of the employee"),
     title: str | None = None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,
+    publish_status: str | None = "unpublished",  # Fixed typo: publsih_status -> publish_status
     db: Session = Depends(get_db)
 ):
     shift = db.query(Shift).filter(Shift.id == shift_id).first()
@@ -58,13 +59,19 @@ def edit_shift(
         shift.end_time = end_time
     if employee_id is not None:
         shift.employee_id = employee_id
-
+    if publish_status is not None:
+        shift.publish_status = publish_status
+    
     db.commit()
     db.refresh(shift)
     return shift
 
-
-
+@router.get("/shifts/employee-id/{shift_id}")
+def get_employee_id(shift_id,db:Session = Depends(get_db)):
+    employee = db.query(Shift).filter(Shift.id == shift_id).first().employee_id
+    if not employee:
+        raise HTTPException(status_code=404, detail="Shift not found")
+    return {"employee_id" : employee}
 
 @router.get("/shifts/employer")
 def get_shifts(employer_id:int, published: bool, db: Session = Depends(get_db)):

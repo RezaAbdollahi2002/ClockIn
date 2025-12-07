@@ -14,7 +14,7 @@ load_dotenv()
 
 router = APIRouter(prefix="/gemini", tags=["Gemini"])
 
-genai.configure(api_key="AIzaSyCUVHbPm9SVs2pMjAqGoZgsLC1x5V2P8fQ")
+genai.configure(api_key="AIzaSyCoD_6BFcASJclgwOO_pkZu_J2oE79Np7Q")
 
 class Prompt(BaseModel):
     text: str

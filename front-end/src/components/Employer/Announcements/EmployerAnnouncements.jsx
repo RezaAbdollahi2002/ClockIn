@@ -1,0 +1,389 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { PiFiles } from "react-icons/pi";
+import { useForm } from "react-hook-form";
+
+const BASE_URL = "/api/announcements/";
+
+const EmployerAnnouncements = () => {
+  const [createAnnouncement, setCreateAnnouncement] = useState(false);
+  const [editAnnouncements, setEditAnnouncements] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [expiresAt, setExpiresAt] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 3);
+    return date.toISOString().substring(0, 10);
+  });
+  const [attachment, setAttachment] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+  const [announcementId, setAnnouncementId] = useState(null);
+
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const employerId = localStorage.getItem("employer_id");
+  console.log("employer id:", employerId);
+
+  // Fetch announcements
+  useEffect(() => {
+    if (!employerId) return;
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}get-announcements`, {
+          params: { employer_id: employerId },
+        });
+        setAnnouncements(res.data);
+        console.log(res.data)
+      } catch (err) {
+        console.error("Error fetching announcements:", err);
+      }
+    };
+    fetchAnnouncements();
+  }, [employerId]);
+
+  // ---------------- CREATE ----------------
+  const handleCreateSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("employer_id", employerId);
+      formData.append("title", title);
+      formData.append("message", message);
+      if (expiresAt && expiresAt.trim() !== "") {
+        formData.append("expires_at", expiresAt);
+      }
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
+
+      const res = await axios.post(`${BASE_URL}create`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      console.log("Announcement created:", res.data);
+      setAnnouncements((prev) => [...prev, res.data]);
+      resetForm();
+      setCreateAnnouncement(false);
+    } catch (err) {
+      console.error("Error creating announcement:", err);
+    }
+  };
+
+  // ---------------- EDIT ----------------
+  const handleEdit = (announcement) => {
+    setAnnouncementId(announcement.id);
+    setTitle(announcement.title);
+    setMessage(announcement.message);
+    setExpiresAt(announcement.expires_at?.split("T")[0] || "");
+    setAttachment(null);
+    setEditAnnouncements(true);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("employer_id", employerId);
+      formData.append("title", title);
+      formData.append("message", message);
+      if (expiresAt && expiresAt.trim() !== "") {
+        formData.append("expires_at", expiresAt);
+      }
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
+
+      const res = await axios.put(`${BASE_URL}edit/${announcementId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      console.log("Announcement updated:", res.data);
+      setAnnouncements((prev) =>
+        prev.map((a) => (a.id === res.data.id ? res.data : a))
+      );
+      resetForm();
+      setEditAnnouncements(false);
+      setAnnouncementId(null);
+    } catch (err) {
+      console.error("Error updating announcement:", err);
+    }
+  };
+
+  // ---------------- DELETE ----------------
+  const handleDelete = async (announcement) => {
+    if (!window.confirm(`Delete announcement "${announcement.title}"?`)) return;
+    try {
+      await axios.delete(`${BASE_URL}delete/${announcement.id}`);
+      setAnnouncements((prev) => prev.filter((a) => a.id !== announcement.id));
+      console.log("Announcement deleted successfully");
+    } catch (err) {
+      console.error("Error deleting announcement:", err);
+    }
+  };
+
+  // ---------------- HELPERS ----------------
+  const resetForm = () => {
+    setTitle("");
+    setMessage("");
+    setExpiresAt(() => {
+      const date = new Date();
+      date.setMonth(date.getMonth() + 3);
+      return date.toISOString().substring(0, 10);
+    });
+    setAttachment(null);
+  };
+
+  // ---------------- RENDER ----------------
+  const visibleAnnouncements = showAll ? announcements : announcements.slice(0, 2);
+
+  return (
+    <div className="text-black mt-5 md:grid mg:grid-cols-2">
+
+      {/* Action buttons */}
+      <div className="flex justify-center gap-x-2 align-top text-center ">
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-black text-center">Announcement</h1>
+        <button
+          className="text-black  text-sm bg-blue-200 border-2 px-2 rounded-sm mt-1 "
+          onClick={() => setCreateAnnouncement(true)}
+        >
+          Create Announcement
+        </button>
+      </div>
+
+      {/* Create Modal */}
+      {createAnnouncement && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
+          <div className="border border-gray-500 shadow-2xl px-6 py-4 bg-white rounded-xl ">
+            <p
+              className="text-left text-blue-600 cursor-pointer hover:underline mb-3"
+              onClick={() => setCreateAnnouncement(false)}
+            >
+              Back
+            </p>
+            <h1 className="font-bold text-center text-xl lg:text-2xl my-4">Create Announcement</h1>
+            <form onSubmit={handleSubmit(handleCreateSubmit)} className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Title */}
+              <div className="flex gap-3">
+                <label className="text-purple-700 font-bold">Title: </label>
+                <input
+                  {...register("title", { required: "Title is required" })}
+                  type="text"
+                  className="text-sm font-semibold mt-1 px-2 py-2 max-h-[20px] border-gray-400"
+                  placeholder="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                {errors.title && <p>{errors.title.message}</p>}
+              </div>
+              {/* Expiration Date */}
+              <div className="flex gap-3 items-center">
+                <label className="text-purple-700 font-bold">Expiration date:</label>
+                <input
+                  type="date"
+                  className="text-black px-2 py-1 border border-gray-400 rounded-md focus:outline-none"
+                  value={expiresAt}
+                  {...register("expires_at")}
+                  onChange={(e) => setExpiresAt(e.target.value)}
+                  min={new Date().toISOString().substring(0, 10)}
+                />
+                {errors.expires_at && <p className="text-xs text-red-500">{errors.expires_at.message}</p>}
+              </div>
+              {/* Message */}
+              <div>
+                <label className="font-bold block mb-1 text-purple-700">Announcement Message:</label>
+                <textarea
+                  {...register("message", { required: "Message is required" })}
+                  className="border border-gray-700 text-black w-full rounded-md px-2 py-2 min-h-[120px]"
+                  placeholder="Write your announcement..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
+              </div>
+              {/* Attachment */}
+              <div>
+                <label className="font-bold block mb-1 text-purple-700">Attachment:</label>
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="file-upload"
+                    className="flex items-center gap-2 cursor-pointer border border-purple-700 text-purple-700 px-3 py-2 rounded-md hover:bg-purple-50"
+                  >
+                    <p className="text-purple-700 font-bold">Choose File</p>
+                    <PiFiles className="w-6 h-6 text-purple-700" />
+                  </label>
+                  <input id="file-upload" type="file" className="hidden" onChange={(e) => setAttachment(e.target.files[0])} />
+                </div>
+                {attachment && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: <span className="font-medium">{attachment.name}</span>
+                  </p>
+                )}
+                <div className="text-right mt-2">
+                  <button
+                    type="submit"
+                    className="bg-blue-300 text-black font-bold border border-black px-2 py-1 hover:text-white hover:bg-purple-700 hover:scale-105 duration-300"
+                  >
+                    Create
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editAnnouncements && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
+          <div className="border border-gray-500 shadow-2xl px-6 py-4 bg-white rounded-xl">
+            <p
+              className="text-left text-blue-600 cursor-pointer hover:underline mb-3"
+              onClick={() => setEditAnnouncements(false)}
+            >
+              Back
+            </p>
+            <h1 className="font-bold text-center text-xl lg:text-2xl my-4">Edit Announcement</h1>
+            <form onSubmit={handleSubmit(handleEditSubmit)} className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Title */}
+              <div className="flex gap-3">
+                <label className="text-purple-700 font-bold">Title: </label>
+                <input
+                  {...register("title", { required: "Title is required" })}
+                  type="text"
+                  className="text-sm font-semibold mt-1 px-2 py-2 max-h-[20px] border-gray-400"
+                  placeholder="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                {errors.title && <p>{errors.title.message}</p>}
+              </div>
+              {/* Expiration Date */}
+              <div className="flex gap-3 items-center">
+                <label className="text-purple-700 font-bold">Expiration date:</label>
+                <input
+                  type="date"
+                  className="text-black px-2 py-1 border border-gray-400 rounded-md focus:outline-none"
+                  value={expiresAt}
+                  {...register("expires_at")}
+                  onChange={(e) => setExpiresAt(e.target.value)}
+                  min={new Date().toISOString().substring(0, 10)}
+                />
+                {errors.expires_at && <p className="text-xs text-red-500">{errors.expires_at.message}</p>}
+              </div>
+              {/* Message */}
+              <div>
+                <label className="font-bold block mb-1 text-purple-700">Announcement Message:</label>
+                <textarea
+                  {...register("message", { required: "Message is required" })}
+                  className="border border-gray-700 text-black w-full rounded-md px-2 py-2 min-h-[120px]"
+                  placeholder="Write your announcement..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
+              </div>
+              {/* Attachment */}
+              <div>
+                <label className="font-bold block mb-1 text-purple-700">Attachment:</label>
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="edit-file-upload"
+                    className="flex items-center gap-2 cursor-pointer border border-purple-700 text-purple-700 px-3 py-2 rounded-md hover:bg-purple-50"
+                  >
+                    <p className="text-purple-700 font-bold">Choose File</p>
+                    <PiFiles className="w-6 h-6 text-purple-700" />
+                  </label>
+                  <input id="edit-file-upload" type="file" className="hidden" onChange={(e) => setAttachment(e.target.files[0])} />
+                </div>
+                {attachment && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Selected: <span className="font-medium">{attachment.name}</span>
+                  </p>
+                )}
+                <div className="text-right mt-2">
+                  <button
+                    type="submit"
+                    className="bg-blue-300 text-black font-bold border border-black px-2 py-1 hover:text-white hover:bg-purple-700 hover:scale-105 duration-300"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-2  md:flex md:flex-col md:justify-center md:items-center max-h-[400px] overflow-y-auto space-y-3">
+        {/* Announcements list */}
+        {visibleAnnouncements.length > 0 &&
+          visibleAnnouncements.map((announcement, index) => (
+            <div
+              key={announcement.id || index}
+              className="border shadow-2xlshadow-purple-200 mr-2  rounded-sm px-3 py-3 bg-gray-white bg-white max-w-[600px] justify-center  text-black w-full hover:scale-95 duration:75 my-2 max-h-[600px] overflow-y-auto"
+            >
+              <div className="flex justify-between alignment items-center rounded:lg ">
+                <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>
+                <div className="flex gap-2 align-middle">
+                  <p className="font-bold text-sm md:text-medium ">{announcement.created_at?.split("T")[0]}</p>
+                  <button
+                    className="text-black border border-gray-400 px-2 py-1 shadow-sm hover:text-white hover:bg-blue-200 hover:scale-105 text-xs"
+                    onClick={() => handleEdit(announcement)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-600 text-white hover:text-black hover:bg-red-500  px-2 py-1 text-xs"
+                    onClick={() => handleDelete(announcement)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+              {expandedId === announcement.id ? (
+                <p className="text-sm px-2 w-full break-words">
+                  {announcement.message}
+                  <span className="text-md text-gray-400 font-bold cursor-pointer ml-1" onClick={() => setExpandedId(null)}>
+                    less
+                  </span>
+                </p>
+              ) : (
+                <p className="text-sm px-2 w-full break-words">
+                  {announcement.message.slice(0, 200)}...
+                  <span className="text-md text-gray-400 cursor-pointer ml-1" onClick={() => setExpandedId(announcement.id)}>
+                    more
+                  </span>
+                </p>
+              )}
+              
+              <div className="flex gap-x-3 mt-1">
+                <p className="text-left text-red-500 text-xs lg:text-sm px-2">{announcement.expires_at}</p>
+                <div className="flex items-center gap-2">
+                  📄
+                  <a
+                    href={`http://127.0.0.1:8000/${announcement.attachment_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {(announcement.attachment_url || "").split("/").pop()}
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+
+
+      {/* Show All / Show Less toggle */}
+      {announcements.length > 2 && (
+        <div className="text-center mt-3">
+          <button className="text-blue-600 underline" onClick={() => setShowAll(!showAll)}>
+            {showAll ? "Show Less" : `Show All (${announcements.length})`}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default EmployerAnnouncements;

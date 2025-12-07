@@ -8,16 +8,16 @@ import {
   Team, Message, EmployerDashboard, EmployerProfile, EmployerSettings, EmployeeSchedule, EmployerSchedule,
   EmployerNavbar, EmployeeAvailabilities,
   Navbar
-} from './components';
-import HomePage from './pages/HomePage';
+} from './components/Helpers';
+import HomePage from './components/Homepage/HomePage';
 import Profile from './components/employeeSettings/Profile';
 import PasswordAndSecurity from './components/employeeSettings/PasswordAndSecurity';
 import Notifications from './components/employeeSettings/Notifications';
 import LocationsAndPINs from './components/employeeSettings/LocationsAndPINs';
 import EmployerDashvoard from './components/EmployerDashboard';
-import EmployerLocationsAndPINs from './components/EmployerLocationsAndPINs';
-import EmployerasswordAndSecurity from './components/EmployerasswordAndSecurity';
-import EmployerNotifications from './components/EmployerNotifications';
+import EmployerLocationsAndPINs from './components/Employer/EmployerLocationsAndPINs';
+import EmployerasswordAndSecurity from './components/Employer/Settings/EmployerasswordAndSecurity';
+import EmployerNotifications from './components/Employer/Settings/EmployerNotifications';
 import EmployerEmployeeMain from './EmployerEmployeeMain';
 import EmployeeRequestsMain from '../src/components/Requests/EmployeeRequestsMain';
 
@@ -154,10 +154,16 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-settings'
-          element={<EmployerSettings
+          element={<>
+          <EmployerSettings
             message={message}
             handleMessageState={handleMessageState}
-            setMessage={setMessage} />}
+            setMessage={setMessage} 
+            
+            // activeBot={activeBot}
+            // setActiveBot={setActiveBot}
+            />
+          </>}
         >
           <Route index element={<EmployerProfile />} />
           <Route

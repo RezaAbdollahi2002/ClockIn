@@ -108,40 +108,38 @@ def get_connected_employees(
             status_code=400,
             detail="You must provide either employee_id or employer_id, but not both."
         )
-    if not employer_id:
-        flag = True
-
+    
     DEFAULT_PROFILE_PIC = "/static/profile_pictures/1_20240627.jpg"
     result = []
-    added_employers = set()
-
+    
     if employee_id:
+        # When employee_id is provided, get their employer and all colleagues
         employee = db.query(Employee).filter(Employee.id == employee_id).first()
         if not employee:
             raise HTTPException(status_code=404, detail="Employee not found")
-
+        
         employer_id = employee.employer_id
         if not employer_id:
             raise HTTPException(status_code=400, detail="This employee has no employer assigned")
-
-    employer = db.query(Employer).filter(Employer.id == employer_id).first()
-    if not employer:
-        raise HTTPException(status_code=404, detail="Employer not found")
-
-    employees = db.query(Employee).filter(Employee.employer_id == employer_id).all()
-
-    for emp in employees:
-        if emp.id == employee_id:  # skip self if employee_id provided
-            continue
-        emp_pic = str (emp.profile_picture or DEFAULT_PROFILE_PIC).lstrip("/")
-        result.append({
-            "id": emp.id,
-            "role": "employee",
-            "full_name": f"{emp.first_name} {emp.last_name}",
-            "profile_pic": emp_pic,
-        })
-    print(employer_id)
-    if flag:
+        
+        employer = db.query(Employer).filter(Employer.id == employer_id).first()
+        if not employer:
+            raise HTTPException(status_code=404, detail="Employer not found")
+        
+        # Get all employees from same employer (excluding self)
+        employees = db.query(Employee).filter(Employee.employer_id == employer_id).all()
+        for emp in employees:
+            if emp.id == employee_id:  # skip self
+                continue
+            emp_pic = str(emp.profile_picture or DEFAULT_PROFILE_PIC).lstrip("/")
+            result.append({
+                "id": emp.id,
+                "role": "employee",
+                "full_name": f"{emp.first_name} {emp.last_name}",
+                "profile_pic": emp_pic,
+            })
+        
+        # Add the employer
         emp_employer_pic = str(employer.profile_picture or DEFAULT_PROFILE_PIC).lstrip("/")
         result.append({
             "id": employer.id,
@@ -149,7 +147,24 @@ def get_connected_employees(
             "full_name": f"{employer.first_name} {employer.last_name}",
             "profile_pic": emp_employer_pic,
         })
-
+    
+    else:  # employer_id is provided
+        # When employer_id is provided, get employer and all employees (excluding employer from list)
+        employer = db.query(Employer).filter(Employer.id == employer_id).first()
+        if not employer:
+            raise HTTPException(status_code=404, detail="Employer not found")
+        
+        # Get all employees from this employer
+        employees = db.query(Employee).filter(Employee.employer_id == employer_id).all()
+        for emp in employees:
+            emp_pic = str(emp.profile_picture or DEFAULT_PROFILE_PIC).lstrip("/")
+            result.append({
+                "id": emp.id,
+                "role": "employee",
+                "full_name": f"{emp.first_name} {emp.last_name}",
+                "profile_pic": emp_pic,
+            })
+    
     return {"team": result}
 # =========================
 # Conversations
@@ -166,8 +181,15 @@ def create_conversation(request: ConversationCreateRequest, db: Session = Depend
         if len(participants) != 2:
             raise HTTPException(status_code=400, detail="Direct chat needs 2 participants")
         name = ["", ""]
-        name[0] = db.query(Employee).filter(Employee.id == participants[1]).first().first_name
-        name[1] = db.query(Employee).filter(Employee.id == participants[0]).first().first_name
+        if request.roles[0] == "employee":
+            name[0] = db.query(Employee).filter(Employee.id == participants[0]).first().first_name
+        else:
+            name[0] = db.query(Employer).filter(Employer.id == participants[0]).first().first_name
+        if request.roles[1] == "employer":
+            name[1] = db.query(Employer).filter(Employer.id == participants[1]).first().first_name
+        else:
+            name[1] = db.query(Employee).filter(Employee.id == participants[1]).first().first_name
+
         name = "&".join(name)
         conv = Conversation(type="direct", name=name)
         db.add(conv)

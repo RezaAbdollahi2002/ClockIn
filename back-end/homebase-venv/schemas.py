@@ -301,6 +301,10 @@ class ShiftEmployeeDashboard(BaseModel):
     start_time: datetime
     end_time: datetime
 
+class SHiftEmployerUpdate(BaseModel):
+    id: int
+    publish_status: str
+
 # ----------------------- Announcements -----------------
 class AnnouncementCreate(BaseModel):
     employer_id: int

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from 'react'
-import Message from '../Message'
+import Message from '../Message/Message'
 import { FaHireAHelper } from "react-icons/fa";
 import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
@@ -115,18 +115,7 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
       console.error(err);
     }
   }
-  // const handleAcceptCoverFalse = async (shift) => {
-  //   if (!shift) return;
-  //   try {
-  //     await axios.put(`/api/shifts/cover-request/${shift.request_id}/respond`,null, {
-  //       params: {
-  //         "responder_id ": employeeId, "accept": false
-  //       }
-  //     })
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }\
+  
 
   const getTradeSifts = async (shiftProposer, shiftTaker) => {
     if (!employeeId) return;
@@ -191,7 +180,7 @@ const EmployeeRequestsMain = ({ message, setMessage, activeBot, setActiveBot }) 
                   </div>
 
                   <button
-                    onClick={() => handleRequestTrade(shift.id)}
+                    onClick={() => handleRequestCover(shift.id)}
                     className='text-gray-700 bg-purple-300  border-grya-800 text-sm rounded-md mt-2 px-1 py-1 hover:text-white hover:bg-gray-800  text-center w-full'>
                     Request Trade
                   </button>
