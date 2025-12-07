@@ -1,0 +1,91 @@
+[33mf21ab8b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mintermediate-branch[m[33m, [m[1;32mmain[m[33m)[m Front is organized
+[33m667e5b6[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/RezaAbdollahi2002/ClockIn
+[33m351a2d8[m multiple poeple added
+[33m5c45a9e[m Updated chatbot
+[33mfdb43e9[m valid added
+[33m6792c50[m Stopped tracking ignored file
+[33mb7b06fe[m gemini
+[33m89f7611[m Remove duplicate MAIL_SERVER entry in .env
+[33me68173d[m fixed
+[33mc2593cd[m chat updated gemini added
+[33m36a76ed[m chat system done
+[33m1c38082[m Chat system has been updated!
+[33m99236c3[m conversation deleted
+[33m3bff3f7[m  conflict
+[33m7ca523d[m andpercand
+[33mcb8f06d[m Employee Almost Done
+[33m749cf35[m  get employee and add employer id by it
+[33mc3a6e13[m  get employee and add employer id by it
+[33m3177a9e[m gets fixed
+[33mcb0ce9b[m gets fixed
+[33m720da85[m Merge branch 'main' of https://github.com/RezaAbdollahi2002/Homebase-411
+[33mad40a73[m 2 functions implemented
+[33m804244f[m EmployerEmployeeMain Updated
+[33m97d1ed3[m Merge branch 'main' of https://github.com/RezaAbdollahi2002/ClockIn
+[33m5a2d869[m Untrack database & apply .gitignore rules
+[33md393acd[m chat fixed
+[33m9149662[m added 2 functions
+[33m1479915[m Stop tracking secret.txt
+[33mf91e906[m Updated
+[33m4960141[m Updated
+[33me3ea113[m Resolved conflicts keeping remote changes
+[33m3af3608[m updated
+[33mceb522d[m Updated employee and employer dashboard plus the schedule
+[33m2c8b81e[m Resolve merge conflicts
+[33m9734dca[m gitignore fixed
+[33m35ab511[m avialability added
+[33mdac1901[m Updated the Employee Dashboard and the Employee Schedule
+[33mc09a617[m availability enshaalah doreste
+[33md54e6ae[m availability added - resolved conflicts by accepting Pofios
+[33m892b800[m updated db
+[33m56be68e[m Updated 11-24-2025
+[33me37473d[m 09-17-2025
+[33m112588d[m new updated message system
+[33m73cc0ca[m New updated message system
+[33m4148c52[m ne
+[33m1dbe24b[m updated Emloyee dashboard
+[33m739b33b[m New version added
+[33m5cb689a[m absoulute file path completed
+[33mc6181fb[m employer not compatibale for now
+[33mb6c9e8e[m employer added to logic
+[33m07cde24[m gitignore changed
+[33mff3329a[m gitignore changed
+[33m73a0b82[m new db added
+[33m007b7eb[m gitignore changed
+[33m15392ca[m gitignore changed
+[33m9e00de3[m Remove node_modules from Git tracking
+[33m9934aee[m new changes
+[33m20a748f[m Add node_modules to .gitignore
+[33m4063d1c[m Remove node_modules from Git and ignore it
+[33m6eebf97[m new changes 09-05-2025
+[33me30c898[m Resolve merge conflict: keep local DB ignored
+[33me2262bd[m Ignore DB file in back-end
+[33mabd7461[m  masseging system is working now
+[33m91b4678[m  file retrival is nowworking on back end
+[33m9b3bb68[m  fixed
+[33m4ffecbe[m massege fixed
+[33m49f0f21[m new
+[33m903b86a[m  group now has a list for roles
+[33m8c6fb63[m  chatuser removed and team fixed
+[33mafd0956[m  chatuser removed and team fixed
+[33m7250ab9[m  deelted added
+[33m36da373[m delete employee added
+[33m2321d17[m name added in conv create
+[33mc3df6ba[m gitignore
+[33m169dd65[m db added
+[33m67a5e64[m Untrack cache/db files now ignored by .gitignore
+[33mf6dd361[m gitignore enhanced
+[33m6d2fbc0[m Merge branch 'main' of https://github.com/RezaAbdollahi2002/Homebase-411
+[33mc037f20[m  gitignore enhanced
+[33m2fc00d4[m Delete back-end/homebase-venv/pyvenv.cfg
+[33m68098a1[m Delete back-end/homebase-venv/ALTER
+[33mb7e6a42[m Delete back-end/homebase-venv/.exit
+[33mdd268aa[m Delete back-end/homebase-venv/Include/site/python3.12/greenlet directory
+[33m2948b4c[m Delete back-end/homebase-venv/Lib directory
+[33m9f2fb8d[m chat user fixed and delete by id emp id and employer id added
+[33ma4f87d7[m gitignore
+[33m1e53ad9[m Delete back-end/homebase-venv/__pycache__ directory
+[33m66d00db[m Merge branch 'main' of https://github.com/RezaAbdollahi2002/Homebase-411
+[33m9b76380[m I have modified some files
+[33m19a67ac[m ali's initial commit
+[33md5f7e44[m Initial commit with backend and frontend in one repo
