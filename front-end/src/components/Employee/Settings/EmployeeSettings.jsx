@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import Navbar from './Navbar';
-import Message from './Message';
-import ChatBot from './AI/ChatBot';
+import Navbar from '../../Navbar/Navbar';
+import Message from '../../Message/Message';
+import ChatBot from '../../AI/ChatBot';
 
 const EmployeeSettingsLayout = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
   const location = useLocation();

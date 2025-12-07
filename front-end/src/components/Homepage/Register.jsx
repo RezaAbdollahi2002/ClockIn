@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Register_image_homepage from '../images/register_homebase_images.png';
-import LogoImage from "../images/LogoClockIn.png";
+import Register_image_homepage from '../../images/register_homebase_images.png';
+import LogoImage from "../../images/LogoClockIn.png";
 import { EnvelopeIcon, LockClosedIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -24,7 +24,7 @@ const Register = () => {
     setLoading(false);
     return;
   }
-
+  
   try {
     const response = await fetch('http://localhost:8000/signin', {
       method: 'POST',

@@ -30,6 +30,7 @@ const WeeklyReview = ({ employeeId }) => {
     setLoading(true);
     setError(null);
     setData(null);
+    console.log(employeeId);
 
     axios
       .get(`/api/employees/${employeeId}/weekly-schedule`, {

@@ -1,9 +1,9 @@
 import EmployerNavbar from "../../Navbar/EmployerNavbar";
 import { useEffect, useState } from "react";
-import Message from "./Message";
+import Message from "../../Message/Message";
 import EmployerAnnouncements from "../Announcements/EmployerAnnouncements";
 import axios from "axios";
-import EmployerDashboardTeamView from "../EmployerDashboardTeamView";
+import EmployerDashboardTeamView from "./EmployerDashboardTeamView";
 
 const EmployerDashboard = ({ message, setMessage }) => {
 

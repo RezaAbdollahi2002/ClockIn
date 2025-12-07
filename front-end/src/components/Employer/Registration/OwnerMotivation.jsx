@@ -4,7 +4,7 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_blue.css';
 import { CalendarDateRangeIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import { useSignup } from './employeeSettings/EmployeeSignupContext';
+import Singup from '../../SignUp/Singup';
 import { useLocation } from 'react-router-dom';
 
 const OwnerMotivation = () => {

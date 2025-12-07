@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import EmployerNavbar from "./Employer/EmployerNavbar";
+import EmployerNavbar from "../../Navbar/EmployerNavbar";
 import axios from "axios";
-import Message from "./Message";
-import PublishedSchedule from "../components/EmployerSchedule/PublishedSchedule";
-import UnpublishedSchedule from "./EmployerSchedule/UnpublishedSchedule";
+import Message from "../../Message/Message";
+import PublishedSchedule from "./PublishedSchedule";
+import UnpublishedSchedule from "./UnpublishedSchedule"
 import { useNavigate } from "react-router-dom";
-import Autogenerate from "./EmployerShifts/Autogenerate";
+import Autogenerate from "../../EmployerShifts/Autogenerate"
 
 const API_BASE_URL = "http://localhost:8000";
 

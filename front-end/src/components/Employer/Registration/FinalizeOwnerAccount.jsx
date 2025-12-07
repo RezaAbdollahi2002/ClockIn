@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from "react";
-import { useSignup } from "./employeeSettings/EmployeeSignupContext";
+import UserSignup from "../../Employee/Registration/UserSignup";
 import { useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import axios from "axios";

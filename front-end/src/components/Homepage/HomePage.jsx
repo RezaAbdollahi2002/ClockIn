@@ -1,5 +1,5 @@
 import React from 'react'
-import { Register } from '../Helpers'
+import { Register } from '../..'
 import { FaGithub } from "react-icons/fa";
 import Footer from './Footer';
 const HomePage = () => {

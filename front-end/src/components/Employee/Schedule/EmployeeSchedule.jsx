@@ -5,10 +5,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import Navbar from "./Navbar";
-import Message from "./Message";
-import ChatBot from "./AI/ChatBot";
-
+import Navbar from "../../Navbar/Navbar";
+import Message from "../../Message/Message";
+import ChatBot from "../../AI/ChatBot";
 const EmployeeSchedule = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(true);

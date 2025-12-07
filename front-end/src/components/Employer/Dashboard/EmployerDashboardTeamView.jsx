@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import AvatarImage from "../assets/Avatar.webp";
+import AvatarImage from "../../../assets/Avatar.webp";
 import { useNavigate } from 'react-router-dom';
 
 const EmployerDashboardTeamView = () => {

@@ -1,5 +1,5 @@
-import ImageSignupOwner from '../images/owner-singup-image.png'
-import ImageSignupOwner2 from '../images/owner-singup-image-2.png'
+import ImageSignupOwner from '../../../images/owner-singup-image.png'
+import ImageSignupOwner2 from '../../../images/owner-singup-image-2.png'
 import OwnerSignupForm from './OwnerSignupForm';
 
 

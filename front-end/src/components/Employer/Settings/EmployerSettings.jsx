@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import EmployerNavbar from './Employer/EmployerNavbar';
-import Message from './Message';
+import EmployerNavbar from '../../Navbar/EmployerNavbar';
+import Message from '../../Message/Message';
 
 const EmployerSettings = ({ message, handleMessageState, setMessage }) => {
   const location = useLocation();

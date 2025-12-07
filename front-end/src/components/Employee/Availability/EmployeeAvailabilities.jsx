@@ -3,10 +3,10 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { FaPlus } from "react-icons/fa";
-import Message from "./Message";
-import Navbar from "./Navbar";
+import Message from "../../Message/Message";
+import Navbar from "./../../Navbar/Navbar";
 import axios from "axios";
-import ChatBot from "./AI/ChatBot";
+import ChatBot from "../../AI/ChatBot";
 
 const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
     const [newAvailability, setNewAvailability] = useState(false);

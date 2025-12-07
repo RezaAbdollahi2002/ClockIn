@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { Typewriter } from "react-simple-typewriter";
-import { useSignup } from "./employeeSettings/EmployeeSignupContext";
+import UserSignup from "./UserSignup";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 

@@ -5,21 +5,21 @@ import {
   OwnerSignup, OwnerMotivation, BusinessInfoOwnerSignUp, CreateOwnerAccount,
   SignupEmployee, UserSignup, UserContactInfoSignup, UserAccountinfo,
   UserCheckingAccountInfo, EmployeeDashboard, FinalizeOwnerAccount, EmployeeSettings,
-  Team, Message, EmployerDashboard, EmployerProfile, EmployerSettings, EmployeeSchedule, EmployerSchedule,
+  Team, Message, EmployerProfile, EmployerSettings, EmployeeSchedule, EmployerSchedule,
   EmployerNavbar, EmployeeAvailabilities,
   Navbar
-} from './components/Helpers';
+} from '.';
 import HomePage from './components/Homepage/HomePage';
 import Profile from './components/employeeSettings/Profile';
 import PasswordAndSecurity from './components/employeeSettings/PasswordAndSecurity';
 import Notifications from './components/employeeSettings/Notifications';
 import LocationsAndPINs from './components/employeeSettings/LocationsAndPINs';
-import EmployerDashvoard from './components/EmployerDashboard';
 import EmployerLocationsAndPINs from './components/Employer/EmployerLocationsAndPINs';
 import EmployerasswordAndSecurity from './components/Employer/Settings/EmployerasswordAndSecurity';
 import EmployerNotifications from './components/Employer/Settings/EmployerNotifications';
 import EmployerEmployeeMain from './EmployerEmployeeMain';
 import EmployeeRequestsMain from '../src/components/Requests/EmployeeRequestsMain';
+import EmployerDashboard from './components/Employer/Dashboard/EmployerDashboard';
 
 const App = () => {
   const [message, setMessage] = useState(false);

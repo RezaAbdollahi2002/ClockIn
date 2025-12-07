@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Message from "./Message";
-import EmployeeShiftsDashboard from "../EmployeeShiftsDashboard";
-import EmployeeShiftWeeklyReviw from "../EmployeeShiftWeeklyReviw";
-import Navbar from "./Navbar";
-import EmployeeAnnouncement from "./Employee/EmployeeAnnouncement";
-import ElectricBorder from "./Animations/ElectricBorder";
-import ChatBot from "./AI/ChatBot";
-import Avatar from "../assets/Avatar.webp";
+import Message from "../../Message/Message";
+import EmployeeShiftsDashboard from "./EmployeeShiftsDashboard";
+import EmployeeShiftWeeklyReviw from "./EmployeeShiftWeeklyReviw";
+import Navbar from "../../Navbar/Navbar";
+import EmployeeAnnouncement from "./EmployeeAnnouncement";
+// import ElectricBorder from "./Animations/ElectricBorder";
+import ChatBot from "../../AI/ChatBot";
+import Avatar from "../../../assets/Avatar.webp";
 
 const EmployeeDashboard = ({ message, setMessage, activeBot, setActiveBot }) => {
   const [employeeName, setEmployeeName] = useState("Employee");

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import businesInfoImage from '../images/homebase-business-info.png';
-import { useSignup } from "./employeeSettings/EmployeeSignupContext";
+import businesInfoImage from '../../../images/homebase-business-info.png';
+import UserSignup from "../../Employee/Registration/UserSignup";
 import { useLocation } from "react-router-dom";
 
 const BusinessInfoOwnerSignUp = () => {

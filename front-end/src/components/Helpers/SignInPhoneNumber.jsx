@@ -1,5 +1,5 @@
 import React from 'react'
-import Register_image_homepage from '../images/register_homebase_images.png'
+import Register_image_homepage from '../../images/register_homebase_images.png'
 import { EnvelopeIcon, LockClosedIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
