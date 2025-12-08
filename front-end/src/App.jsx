@@ -79,6 +79,8 @@ const App = () => {
                 message={message}
                 handleMessageState={handleMessageState}
                 setMessage={setMessage}
+                activeBot={activeBot}
+                setActiveBot={setActiveBot}
               />
             </>
           }

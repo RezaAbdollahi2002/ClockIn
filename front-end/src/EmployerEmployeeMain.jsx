@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ChatBot from './components/AI/ChatBot';
 import {
   TrashIcon,
   CalendarIcon,
@@ -22,6 +23,8 @@ const EmployerEmployeeMain = ({
   message,
   handleMessageState,
   setMessage,
+  activeBot,
+  setActiveBot
 }) => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -101,6 +104,8 @@ const EmployerEmployeeMain = ({
   const toggleAvailabilityPanel = useCallback(() => {
     setShowAvailability((prev) => !prev);
   }, []);
+
+  const handleCloseMessage = () => setMessage(false);
 
   // Loading state
   if (loading) {
@@ -284,31 +289,27 @@ const EmployerEmployeeMain = ({
 
       {/* Message Panel */}
       {message && (
-        <div className="fixed inset-0 z-50">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/30 transition-opacity duration-300"
-            onClick={() => setMessage(false)}
+        <aside
+          className={`fixed right-0 top-0 z-50 h-screen w-[350px] transform overflow-auto border-l border-gray-300 bg-white p-4 shadow-2xl transition-transform duration-300 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            }`}
+          role="complementary"
+          aria-label="Message Panel"
+        >
+          <Message
+            onClose={handleCloseMessage}
+            activeBot={activeBot}
+            setActiveBot={setActiveBot}
           />
-
-          {/* Panel */}
-          <div className="absolute top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Messages</h3>
-              <button
-                onClick={() => setMessage(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close messages"
-              >
-                <XMarkIcon className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-auto">
-              <Message onClose={() => setMessage(false)} />
-            </div>
-          </div>
-        </div>
+        </aside>
+      )}
+     {activeBot && (
+        <aside
+          className="fixed left-4 top-40 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
+          role="complementary"
+          aria-label="Chat Assistant"
+        >
+          <ChatBot />
+        </aside>
       )}
     </div>
   );

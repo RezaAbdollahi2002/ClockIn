@@ -97,7 +97,7 @@ const EmployerDashboard = ({ message, setMessage, activeBot, setActiveBot }) => 
       </div>
       {message && (
         <div
-          className={`absolute top-10 min-h-screen h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-2000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+          className={`fixed top-10 min-h-screen h-full right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-shadow duration-2000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
             }`}
         >
           <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />

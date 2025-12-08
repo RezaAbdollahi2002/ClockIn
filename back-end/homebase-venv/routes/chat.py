@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, and_
 import schemas
 from database import get_db
-from models import Conversation, Participant, Message, Employee, Employer
+from models import Conversation, Participant, Message, Employee, Employer,Participant
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -307,6 +307,45 @@ def list_participants(conversation_id: int, db: Session = Depends(get_db)):
         {"id":p.id,"employee_id": p.employee_id, "employer_id": p.employer_id, "role": p.role, "joined_at": p.joined_at.isoformat()}
         for p in conv.participants
     ]
+
+@router.get("/conversation/{conversation_id}/participant")
+def get_senderid(
+    conversation_id: int,
+    employee_id: Optional[int] = Query(None),
+    employer_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db)
+):
+    if employee_id and employer_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Send either employee_id or employer_id, not both."
+        )
+
+    if not employee_id and not employer_id:
+        raise HTTPException(
+            status_code=400,
+            detail="You must provide either employee_id or employer_id."
+        )
+
+    if employee_id:
+        participant = db.query(Participant).filter(
+            Participant.employee_id == employee_id,
+            Participant.conversation_id == conversation_id
+        ).first()
+    else:
+        participant = db.query(Participant).filter(
+            Participant.employer_id == employer_id,
+            Participant.conversation_id == conversation_id
+        ).first()
+
+    if not participant:
+        raise HTTPException(
+            status_code=404,
+            detail="No participant found for this conversation."
+        )
+
+    return {"sender_id": participant.id}
+
 
 @router.post("/conversation/{conversation_id}/rename")
 def rename_group(

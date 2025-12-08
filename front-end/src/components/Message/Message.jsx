@@ -212,14 +212,32 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
     setActiveConversation(conv);
     setMessages([]);
 
-    if (ws.current) ws.current.close();
     try {
-      // Conversation problem 2
-      const res = await axios.get(`/api/chat/conversation/${conv.id}/participants`);
-      setMe(res.data[0].id == userId);
+      const res = await axios.get(
+        `/api/chat/conversation/${conv.id}/participant`,
+        {
+          params: {
+            employee_id: employeeId || null,
+            employer_id: employerId || null
+          }
+        }
+      );
+
+      setMe(res.data.sender_id);
+      alert(res.data.sender_id);
+
     } catch (err) {
-      console.error(err);
+      console.error("Failed to get sender_id:", err.response?.data || err.message);
     }
+
+    if (ws.current) ws.current.close();
+    // try {
+    //   // Conversation problem 2
+    //   const res = await axios.get(`/api/chat/conversation/${conv.id}/participants`);
+    //   setMe(res.data[0].id == userId);
+    // } catch (err) {
+    //   console.error(err);
+    // }
 
     const res = await axios.get(`${BASE_URL}messages/${conv.id}`);
     setMessages(res.data);
@@ -341,33 +359,33 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
       setMessageSent(true);
 
       // ✅ notify backend websocket
-       try {
-      const res = await axios.get(`/api/chat/messages/${activeConversation.id}`);
-      setMessages(res.data);
-    console.log("message" + JSON.stringify(res.data, null, 2));
-
-    ws.current = new WebSocket(`ws://localhost:8000/chat/ws/${conv.id}`);
-
-    ws.current.onopen = () => console.log("Connected via WebSocket");
-
-    ws.current.onmessage = (event) => {
       try {
-        const msg = JSON.parse(event.data);
-        setMessages((prev) => [...prev, msg.message || msg]);
-      } catch {
-        console.log("Received:", event.data);
-      }
-    };
+        const res = await axios.get(`/api/chat/messages/${activeConversation.id}`);
+        setMessages(res.data);
+        console.log("message" + JSON.stringify(res.data, null, 2));
 
-    ws.current.onclose = () => console.log("WebSocket closed");
-      setCurrentFileType(res.data.attachment_type)
-      setCurrentFile(res.data.attachment_url);
-      console.log("current file: ", res.data.attachment_url);
-      setShowCurrentFile(true);
-      console.log(showCurrentFile);
-    } catch (err) {
-      console.error(err);
-    }
+        ws.current = new WebSocket(`ws://localhost:8000/chat/ws/${activeConversation.id}`);
+
+        ws.current.onopen = () => console.log("Connected via WebSocket");
+
+        ws.current.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            setMessages((prev) => [...prev, msg.message || msg]);
+          } catch {
+            console.log("Received:", event.data);
+          }
+        };
+
+        ws.current.onclose = () => console.log("WebSocket closed");
+        setCurrentFileType(res.data.attachment_type)
+        setCurrentFile(res.data.attachment_url);
+        console.log("current file: ", res.data.attachment_url);
+        setShowCurrentFile(true);
+        console.log(showCurrentFile);
+      } catch (err) {
+        console.error(err);
+      }
     } catch (err) {
       console.error("Send message failed:", err);
     }
@@ -414,8 +432,8 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
                   <IoCloseSharp className="bg-white w-4 h-4 text-purple-700" />
                 </button>
                 <button className="text-md text-purple-800 font-bold" onClick={() => handleActiveBot()}>
-                        Bot
-                      </button>
+                  Bot
+                </button>
 
               </div>
               {/* Conversations finder  */}
@@ -537,7 +555,7 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
       {activeConversation && (
         <div className="bg-white  flex flex-col h-[90vh]  overflow-y-auto">
 
-          <div className="flex items-center justify-between w-full relative bg-gray-200 text-black">
+          <div className="flex items-center justify-between w-full relative bg-gray-gray-800 text-white">
             {/* Back Button */}
             <button
               className="absolute left-0 flex items-center p-2"
@@ -546,12 +564,15 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
               <MdOutlineArrowBackIosNew className="w-4 h-4 text-gray-800 font-bold text-lg" />
 
             </button>
+            <div className="">
+              <h1>Close</h1>
 
+            </div>
             {/* Title */}
             <h2 className="font-bold text-lg text-center w-full">
               <div className="flex gap-4 justify-between ">
-                <h1 className="ml-8 text-md md:text-lg font-bold">{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[0] : activeConversation.name.split("&")[1]}</h1>
-                <h1 className="ml-8 text-md md:text-lg font-bold mr-2">{activeConversation.type === "group" ? "" : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1>
+                {/* <h1 className="ml-8 text-md md:text-lg font-bold">{activeConversation.type === "group" ? activeConversation.name : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[0] : activeConversation.name.split("&")[1]}</h1>
+                <h1 className="ml-8 text-md md:text-lg font-bold mr-2">{activeConversation.type === "group" ? "" : activeConversation.name.split("&")[0] === myName ? activeConversation.name.split("&")[1] : activeConversation.name.split("&")[0]}</h1> */}
               </div>
 
             </h2>
@@ -561,7 +582,7 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
             {messages.map((msg, index) => (
               <div
                 key={msg.id || index}
-                className={`flex items-end ${msg.sender_id === me ? "justify-start " : "justify-end"
+                className={`flex items-end ${msg.sender_id === me ? "justify-end " : "justify-start"
                   }`}
               >
                 <div
@@ -597,8 +618,8 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
                       <>
                         <div>
                           <a href={`/api/${url}`}
-                          target="_blank"
-    rel="noopener noreferrer"
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <img
                               src={`/api/${url}`}
