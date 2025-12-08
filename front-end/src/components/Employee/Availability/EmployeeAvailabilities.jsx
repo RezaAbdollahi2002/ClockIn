@@ -513,7 +513,7 @@ const EmployeeAvailabilities = ({ message, handleMessageState, setMessage, activ
     return (
         <div className="bg-gray-800 -mt-4 py-2">
 <div className=" max-h-screen max-w-[1200px] mx-auto bg-white -mt-3 shadow-2xl shadow-white ">
-                            <h1 className="md:text-3xl text-lg text-center mt-15 font-bold  text-purple-800">Availability</h1>
+                            <h1 className="md:text-3xl text-lg text-center mt-15  pt-10 font-bold   text-purple-800">Availability</h1>
 
             <div className="w-full h-screen p-3 px-2 shadow-lg border-gray-800 rounded-lg">
                 <div className="flex gap-x-3 px-8 py-10 ">

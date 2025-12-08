@@ -6,13 +6,13 @@ import Footer from "./Footer"
 
 const HomePage = () => {
   return (
-    <div className='w flex-col'>
-      <div className='w-full h-auto max-h-[60%]'>
+    <div className=' w-full flex-col ch-screen'>
+      <div className='w-full h-screen '>
         <Register />
       </div>
-      <div className='w-full'>
+      {/* <div className='w-full -mt-20'>
       <Footer />
-      </div>
+      </div> */}
     </div>
   )
 }

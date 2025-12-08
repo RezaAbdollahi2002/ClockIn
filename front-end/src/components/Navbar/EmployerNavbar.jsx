@@ -25,35 +25,35 @@ const EmployerNavbar = ({ messageState }) => {
   };
 
   return (
-    <div className="fized z-50 top-0 flex px-2 bg-[#4930EE] w-full py-2 items-center justify-between float-start">
-      <ul className="flex gap-3 items-center">
+    <div className="fixed z-50 top-0 flex px-2 bg-[#4930EE] w-full py-2 items-center justify-between float-start">
+      <ul className="flex gap-3 items-center text-md: md:text-lg">
         <Link
           to={"/onboarding/sign-up/employer-dashboard"}
-          className="text-white mx-2 font-bold text-sm"
+          className="text-white mx-2 font-bold  hover:text-white hover:font-bold"
         >
           Homebase
         </Link>
         <Link
           to={"/onboarding/sign-up/employer-schedule"}
-          className="text-purple-200 text-xs"
+          className="text-purple-200  hover:text-white hover:font-bold"
         >
           Schedule
         </Link>
         <button
           onClick={messageStateFunction}
-          className="text-purple-200 text-xs bg-transparent border-none cursor-pointer"
+          className="text-purple-200  bg-transparent border-none cursor-pointer  hover:text-white hover:font-bold"
         >
           Message
         </button>
         <Link
           to={`/onboarding/sign-up/team`}
-          className="text-purple-200 text-xs"
+          className="text-purple-200  hover:text-white hover:font-bold "
         >
           Team
         </Link>
         <Link
           to={`/onboarding/sign-up/employer-settings`}
-          className="text-purple-200 text-xs"
+          className="text-purple-200   hover:text-white hover:font-bold"
         >
           Settings
         </Link>

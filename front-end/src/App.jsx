@@ -64,7 +64,7 @@ const App = () => {
           element={
             <>
               <EmployerNavbar messageState={handleMessageState} />
-              <EmployerDashboard message={message} setMessage={setMessage} activeBot={activeBot} setActiveBot={setActiveBot}/>
+              <EmployerDashboard message={message} setMessage={setMessage} activeBot={activeBot} setActiveBot={setActiveBot} />
             </>
           }
         />
@@ -88,13 +88,18 @@ const App = () => {
 
         <Route
           path='/onboarding/sign-up/employer-schedule'
-          element={<EmployerSchedule
-            message={message}
-            handleMessageState={handleMessageState}
-            setMessage={setMessage} 
-            activeBot={activeBot}
-            setActiveBot={setActiveBot}
-            />}
+          element={
+            <>
+              <EmployerNavbar messageState={handleMessageState} />
+              <EmployerSchedule
+                message={message}
+                handleMessageState={handleMessageState}
+                setMessage={setMessage}
+                activeBot={activeBot}
+                setActiveBot={setActiveBot}
+              />
+            </>
+          }
         />
 
         {/* Employee Routes */}
@@ -160,12 +165,12 @@ const App = () => {
         <Route
           path='/onboarding/sign-up/employer-settings'
           element={<>
-          <EmployerSettings
-            message={message}
-            handleMessageState={handleMessageState}
-            setMessage={setMessage} 
-            activeBot={activeBot}
-            setActiveBot={setActiveBot}
+            <EmployerSettings
+              message={message}
+              handleMessageState={handleMessageState}
+              setMessage={setMessage}
+              activeBot={activeBot}
+              setActiveBot={setActiveBot}
             />
           </>}
         >
@@ -205,32 +210,32 @@ const App = () => {
           path='/onboarding/Schedule'
           element={
             <>
-            <Navbar messageState={handleMessageState}/>
-            <EmployeeSchedule
-              message={message}
-              handleMessageState={handleMessageState}
-              setMessage={setMessage}
-              activeBot={activeBot}
-              setActiveBot={setActiveBot}
-            /> 
+              <Navbar messageState={handleMessageState} />
+              <EmployeeSchedule
+                message={message}
+                handleMessageState={handleMessageState}
+                setMessage={setMessage}
+                activeBot={activeBot}
+                setActiveBot={setActiveBot}
+              />
             </>
-           
+
           }
         />
         <Route
           path='/onboarding/My_Availabilities'
           element={
             <>
-                        <Navbar messageState={handleMessageState} />
-<EmployeeAvailabilities
-              message={message}
-              handleMessageState={handleMessageState}
-              setMessage={setMessage}
-              activeBot={activeBot}
-              setActiveBot={setActiveBot}
-            />
+              <Navbar messageState={handleMessageState} />
+              <EmployeeAvailabilities
+                message={message}
+                handleMessageState={handleMessageState}
+                setMessage={setMessage}
+                activeBot={activeBot}
+                setActiveBot={setActiveBot}
+              />
             </>
-            
+
           }
         />
       </Routes>

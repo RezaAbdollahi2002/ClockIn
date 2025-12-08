@@ -28,17 +28,17 @@ const Navbar = ({ messageState }) => {
       {/* Navbar */}
       <div className="grid grid-cols-2 px-2 bg-[#1a1365] w-full py-2 items-center justify-between text-white font-semibold fixed top-0 z-50 ">
         {/* Left side */}
-        <div className="hidden md:flex md:gap-3 items-center ">
+        <div className="hidden md:flex md:gap-3 items-center text-md md:text-lg">
           <Link
             to={"/onboarding/sign-up/employee-dashboard"}
-            className="text-white mx-2 font-bold text-sm cursor-pointer hover:scale-105 duration:300"
+            className="text-white mx-2 font-bold  cursor-pointer hover:scale-105 duration:300"
           >
             ClockIn
           </Link>
 
           {/* Desktop Schedule Dropdown */}
           <div className="relative group -mt-0.5">
-            <button className="text-purple-200 text-xs bg-transparent border-none  cursor-pointer hover:scale-105 duration:300">
+            <button className="text-purple-200 mt-1  bg-transparent border-none  cursor-pointer hover:scale-105 duration:300 text-md md:text-lg">
               Schedule
             </button>
             <ul className="absolute top-full left-0 bg-[#35175C] text-white shadow-lg rounded  w-48 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-50">
@@ -53,7 +53,7 @@ const Navbar = ({ messageState }) => {
               <li>
                 <Link
                   to="/onboarding/My_Availabilities"
-                  className="block px-2 py-1 hover:bg-purple-700 text-sm"
+                  className="block px-2 py-1 hover:bg-purple-700 "
                 >
                   My Availabilities
                 </Link>
@@ -63,18 +63,18 @@ const Navbar = ({ messageState }) => {
 
           <button
             onClick={messageStateFunction}
-            className="text-purple-200 text-xs bg-transparent border-none cursor-pointer hover:scale-105 duration:300 "
+            className="text-purple-200  bg-transparent border-none cursor-pointer hover:scale-105 duration:300 "
           >
             Message
           </button>
 
-          <Link to={`/onboarding/sign-up/team`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
+          <Link to={`/onboarding/sign-up/team`} className="text-purple-200  cursor-pointer hover:scale-105 duration:300 ">
             Team
           </Link>
-          <Link to={`/employees/requests`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
+          <Link to={`/employees/requests`} className="text-purple-200  cursor-pointer hover:scale-105 duration:300">
             Requests
           </Link>
-          <Link to={`/onboarding/sign-up/employee-settings`} className="text-purple-200 text-xs cursor-pointer hover:scale-105 duration:300">
+          <Link to={`/onboarding/sign-up/employee-settings`} className="text-purple-200  cursor-pointer hover:scale-105 duration:300">
             Settings
           </Link>
         </div>

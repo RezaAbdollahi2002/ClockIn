@@ -247,10 +247,9 @@ const EmployerSchedule = ({ message, handleMessageState, setMessage, activeBot, 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <EmployerNavbar messageState={handleMessageState} />
 
       {/* Action Menu */}
-      <nav className="bg-gray-800 text-white font-semibold shadow-md">
+      <nav className=" bg-gray-800 text-white font-semibold shadow-md mt-10">
         <ul className="flex gap-x-6 px-6 py-3">
           <li
             className="cursor-pointer hover:text-blue-300 transition-colors"

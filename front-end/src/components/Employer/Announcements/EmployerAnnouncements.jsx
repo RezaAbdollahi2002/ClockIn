@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { PiFiles } from "react-icons/pi";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "/api/announcements/";
 
@@ -11,6 +12,8 @@ const EmployerAnnouncements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const [showAvailabilityDemo, setShowAvailabilityDemo] = useState(false);
   const [expiresAt, setExpiresAt] = useState(() => {
     const date = new Date();
     date.setMonth(date.getMonth() + 3);
@@ -65,6 +68,7 @@ const EmployerAnnouncements = () => {
       setAnnouncements((prev) => [...prev, res.data]);
       resetForm();
       setCreateAnnouncement(false);
+      navigate(0);
     } catch (err) {
       console.error("Error creating announcement:", err);
     }
@@ -313,15 +317,18 @@ const EmployerAnnouncements = () => {
           </div>
         </div>
       )}
-      <div className="grid grid-cols-2  md:flex md:flex-col md:justify-center md:items-center max-h-[400px] overflow-y-auto space-y-3">
+      <div
+        onClick={() => setShowAvailabilityDemo(!showAvailabilityDemo)}
+        className="grid grid-cols-2  md:flex md:flex-col md:justify-center md:items-center max-h-[400px] overflow-y-auto space-y-3">
         {/* Announcements list */}
         {visibleAnnouncements.length > 0 &&
           visibleAnnouncements.map((announcement, index) => (
             <div
               key={announcement.id || index}
-              className="border shadow-2xlshadow-purple-200 mr-2  rounded-sm px-3 py-3 bg-gray-white bg-white max-w-[600px] justify-center  text-black w-full hover:scale-95 duration:75 my-2 max-h-[600px] overflow-y-auto"
+              className={`border shadow-2xlshadow-purple-200 mr-2  rounded-sm px-3 py-3 bg-gray-white bg-white max-w-[800px] justify-center  text-black w-full hover:border-blue-900 hover:shadow-2xl hover:shadow-purple-950 my-2 max-h-[600px] overflow-y-auto
+                `}
             >
-              <div className="flex justify-between alignment items-center rounded:lg ">
+              <div className="flex justify-between alignment items-center rounded:lg max-h-[600px] ">
                 <h1 className="text-lg lg:text-xl my-2 text-center font-bold">{announcement.title}</h1>
                 <div className="flex gap-2 align-middle">
                   <p className="font-bold text-sm md:text-medium ">{announcement.created_at?.split("T")[0]}</p>
@@ -354,19 +361,53 @@ const EmployerAnnouncements = () => {
                   </span>
                 </p>
               )}
-              
-              <div className="flex gap-x-3 mt-1">
+
+              <div className="flex gap-x-3 mt-1 justify-between">
                 <p className="text-left text-red-500 text-xs lg:text-sm px-2">{announcement.expires_at}</p>
                 <div className="flex items-center gap-2">
                   📄
-                  <a
-                    href={`http://127.0.0.1:8000/${announcement.attachment_url}`}
+                  {/* <a
+                    href={`/api/${announcement.attachment_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 underline"
                   >
                     {(announcement.attachment_url || "").split("/").pop()}
-                  </a>
+                  </a> */}
+                  {announcement.attachment_url && (() => {
+                    const url = announcement.attachment_url;
+                    const isImage = /\.(jpe?g|png|gif|webp|svg)$/i.test(url);
+
+                    return isImage ? (
+                      <>
+                        <div className="flex gap-x-2">
+                          
+                          <a href={`/api/${url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src={`/api/${url}`}
+                              alt="Attachment"
+                              className="mt-2 max-w-[100px] max-h-[100px] rounded-md border border-gray-300 shadow-xl "
+                            />
+                          </a>
+                          {/* <a href={`/api/${url}`}>download</a> */}
+                        </div>
+                      </>
+
+
+                    ) : (
+                      <a
+                        href={`/api/${url}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-xs text-blue-700 mt-1 underline"
+                      >
+                        📎 File
+                      </a>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

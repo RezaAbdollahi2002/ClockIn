@@ -13,7 +13,7 @@ router = APIRouter(prefix="/announcements", tags=["Announcements"])
 
 # BASE_DIR is the project root (one level up from routes/)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))      # <project_root>
-UPLOAD_DIR = os.path.join(BASE_DIR, "uploads/chat/")             # <project_root>/uploads
+UPLOAD_DIR = os.path.join(BASE_DIR, "uploads/")             # <project_root>/uploads
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 # ---------------------- CREATE ----------------------
 @router.post("/create", response_model=schemas.AnnouncementOut)

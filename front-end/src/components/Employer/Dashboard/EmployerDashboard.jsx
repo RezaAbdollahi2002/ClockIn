@@ -64,8 +64,8 @@ const EmployerDashboard = ({ message, setMessage, activeBot, setActiveBot }) => 
   }, [employerId])
 
   return (
-    <div className="bg-[#1A1346]  min-h-screen py-4     ">
-      <div className="bg-white max-w-[1200px] mx-auto  -mt-4">
+    <div className="bg-[#1A1346]   min-h-screen py-4     ">
+      <div className="bg-white max-w-[1200px] mx-auto  -mt-4 shadow-2xl shadow-white">
         <div className="flex flex-col gap-y-3 mt-10 justify-center ">
           {
             profileShow && (

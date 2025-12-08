@@ -46,27 +46,33 @@ const EmployerDashboardTeamView = () => {
 
     return (
         <div className='max-h-screen'>
+
             <h1 className='text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-center text-white'>Team</h1>
             {/* 🔍 Search Bar */}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mb-3">
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search employee by name..."
-                    className="px-4 py-2 w-full max-w-md rounded-md border border-gray-300  bg-white
+                    className="px-4 p-2 w-full max-w-md rounded-md border border-gray-300  bg-white
                                focus:ring-2 focus:ring-purple-500 focus:outline-none"
                 />
+            </div>
+            <div className='flex justify-center mx-auto mt-2'>
+                <h1 className='text-md: md:text-lg text-blue-800 font-bold'>
+                    <span>{visibleTeam.length > 0 ? visibleTeam.length : "Zero"}</span> Employees
+                </h1>
             </div>
 
             {/* Grid */}
             <div className='flex flex-col gap-y-4 md:grid md:gap-6 md:grid-cols-6 mt-4'>
                 {visibleTeam.map((t, index) => (
-                    <div className='bg-white px-3 py-3 rounded-medium shadow-lg shadow-white hover:scale-105 duration-300'
-                         key={index}
-                         onClick={() => handleClick(t)}>
+                    <div className='bg-white px-3 py-3 rounded-lg shadow-2xl shadow-blue-200 hover:border-purple-800 hover:scale-105 duration-300  border-2 border-purple-800'
+                        key={index}
+                        onClick={() => handleClick(t)}>
 
-                        <div className='flex flex-col p-6 justify-center hover:scale-105 hover:bg-purple-200 duration:300 rounded-lg'>
+                        <div className='flex flex-col p-6 justify-center hover:scale-105 hover:cursor-pointer duration:300 rounded-lg'>
                             <div className='mx-auto my-2'>
                                 <img
                                     src={t.profile_picture || AvatarImage}

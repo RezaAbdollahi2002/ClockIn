@@ -224,7 +224,6 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
       );
 
       setMe(res.data.sender_id);
-      alert(res.data.sender_id);
 
     } catch (err) {
       console.error("Failed to get sender_id:", err.response?.data || err.message);
