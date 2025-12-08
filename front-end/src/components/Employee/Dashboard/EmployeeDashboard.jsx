@@ -39,7 +39,7 @@ const EmployeeDashboard = ({ message, setMessage, activeBot, setActiveBot }) => 
 
         setEmployeeName(nameResponse.data.first_name || "Employee");
         setProfilePic(profileResponse.data.profile_pic || Avatar);
-        console.log(profileResponse.data.profile_pic );
+        console.log(profileResponse.data.profile_pic);
       } catch (err) {
         if (axios.isCancel(err)) return;
 
@@ -61,7 +61,7 @@ const EmployeeDashboard = ({ message, setMessage, activeBot, setActiveBot }) => 
 
   return (
     <div className="bg-gray-200 min-h-screen">
-      <div  className=" min-h-screen h-full  bg-gray-50 pt-8 md:max-w-[1200px] md:mx-auto">
+      <div className=" min-h-screen h-full  bg-gray-50 pt-8 md:max-w-[1200px] md:mx-auto">
         <header className="flex flex-col justify-center gap-3">
           <div className="mx-auto mt-10">
             <img
@@ -111,43 +111,42 @@ const EmployeeDashboard = ({ message, setMessage, activeBot, setActiveBot }) => 
             </div>
           </section>
 
-            {/* Right Panel */}
-            <section
-              className="col-span-1 h-full rounded-lg border border-gray-300 bg-white p-6 shadow-lg md:col-span-4 lg:col-span-2"
-              aria-label="Weekly Review"
-            >
-              <EmployeeShiftWeeklyReviw employeeId={employeeId} />
-            </section>
-       </main>
-</div>
-          {/* Message Panel */}
-          {message && (
-            <aside
-              className={`fixed right-0 top-0 z-50 h-screen w-[350px] transform overflow-auto border-l border-gray-300 bg-white p-4 shadow-2xl transition-transform duration-300 ease-in-out ${
-                message ? "translate-x-0" : "translate-x-full"
-              }`}
-              role="complementary"
-              aria-label="Message Panel"
-            >
-              <Message
-                onClose={handleCloseMessage}
-                activeBot={activeBot}
-                setActiveBot={setActiveBot}
-              />
-            </aside>
-          )}
+          {/* Right Panel */}
+          <section
+            className="col-span-1 h-full rounded-lg border border-gray-300 bg-white p-6 shadow-lg md:col-span-4 lg:col-span-2"
+            aria-label="Weekly Review"
+          >
+            <EmployeeShiftWeeklyReviw employeeId={employeeId} />
+          </section>
+        </main>
+      </div>
+      {/* Message Panel */}
+      {message && (
+        <aside
+          className={`fixed right-0 top-0 z-50 h-screen w-[350px] transform overflow-auto border-l border-gray-300 bg-white p-4 shadow-2xl transition-transform duration-300 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            }`}
+          role="complementary"
+          aria-label="Message Panel"
+        >
+          <Message
+            onClose={handleCloseMessage}
+            activeBot={activeBot}
+            setActiveBot={setActiveBot}
+          />
+        </aside>
+      )}
 
-          {/* ChatBot */}
-          {activeBot && (
-            <aside
-              className="fixed left-4 top-20 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
-              role="complementary"
-              aria-label="Chat Assistant"
-            >
-              <ChatBot />
-            </aside>
-          )}
-      
+      {/* ChatBot */}
+      {activeBot && (
+        <aside
+          className="fixed left-4 top-20 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
+          role="complementary"
+          aria-label="Chat Assistant"
+        >
+          <ChatBot />
+        </aside>
+      )}
+
     </div>
   );
 };

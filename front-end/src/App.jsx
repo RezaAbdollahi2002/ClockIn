@@ -64,7 +64,7 @@ const App = () => {
           element={
             <>
               <EmployerNavbar messageState={handleMessageState} />
-              <EmployerDashboard message={message} setMessage={setMessage} />
+              <EmployerDashboard message={message} setMessage={setMessage} activeBot={activeBot} setActiveBot={setActiveBot}/>
             </>
           }
         />
@@ -89,7 +89,10 @@ const App = () => {
           element={<EmployerSchedule
             message={message}
             handleMessageState={handleMessageState}
-            setMessage={setMessage} />}
+            setMessage={setMessage} 
+            activeBot={activeBot}
+            setActiveBot={setActiveBot}
+            />}
         />
 
         {/* Employee Routes */}
@@ -159,9 +162,8 @@ const App = () => {
             message={message}
             handleMessageState={handleMessageState}
             setMessage={setMessage} 
-            
-            // activeBot={activeBot}
-            // setActiveBot={setActiveBot}
+            activeBot={activeBot}
+            setActiveBot={setActiveBot}
             />
           </>}
         >

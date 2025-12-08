@@ -6,10 +6,11 @@ import PublishedSchedule from "./PublishedSchedule";
 import UnpublishedSchedule from "./UnpublishedSchedule"
 import { useNavigate } from "react-router-dom";
 import Autogenerate from "../../EmployerShifts/Autogenerate"
+import ChatBot from "../../AI/ChatBot";
 
 const API_BASE_URL = "http://localhost:8000";
 
-const EmployerSchedule = ({ message, handleMessageState, setMessage }) => {
+const EmployerSchedule = ({ message, handleMessageState, setMessage, activeBot, setActiveBot }) => {
   // State Management
   const [shifts, setShifts] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -231,7 +232,7 @@ const EmployerSchedule = ({ message, handleMessageState, setMessage }) => {
   }
 
   const handleEditInitiate = (shift) => {
-      console.log("Edit initiated for shift:", shift); // DEBUG
+    console.log("Edit initiated for shift:", shift); // DEBUG
 
     setEditForm({
       shiftId: shift.id,
@@ -544,11 +545,20 @@ const EmployerSchedule = ({ message, handleMessageState, setMessage }) => {
       {/* Message Sidebar */}
       {message && (
         <div
-          className={`fixed top-0 right-0 h-screen w-96 bg-white shadow-2xl z-50 p-6 overflow-auto transform transition-transform duration-300 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+          className={`fixed top-21 right-0 h-screen w-96 bg-white shadow-2xl z-50 p-6 overflow-auto transform transition-transform duration-300 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
             }`}
         >
-          <Message onClose={() => setMessage(false)} />
+          <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
         </div>
+      )}
+      {activeBot && (
+        <aside
+          className="fixed left-4 z-50 top-20 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
+          role="complementary"
+          aria-label="Chat Assistant"
+        >
+          <ChatBot />
+        </aside>
       )}
     </div>
   );

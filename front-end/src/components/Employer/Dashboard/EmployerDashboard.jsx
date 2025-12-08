@@ -1,11 +1,12 @@
 import EmployerNavbar from "../../Navbar/EmployerNavbar";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import Message from "../../Message/Message";
 import EmployerAnnouncements from "../Announcements/EmployerAnnouncements";
 import axios from "axios";
 import EmployerDashboardTeamView from "./EmployerDashboardTeamView";
+import ChatBot from "../../AI/ChatBot";
 
-const EmployerDashboard = ({ message, setMessage }) => {
+const EmployerDashboard = ({ message, setMessage, activeBot, setActiveBot }) => {
 
   const [employerName, setEmployerName] = useState("Employer");
   const [loading, setLoading] = useState(true);
@@ -64,7 +65,7 @@ const EmployerDashboard = ({ message, setMessage }) => {
 
   return (
     <div className="bg-[#1A1346]  min-h-screen py-4     ">
-      <div className="bg-white max-w-[1200px] mx-auto max-h-[100%] -mt-4">
+      <div className="bg-white max-w-[1200px] mx-auto  -mt-4">
         <div className="flex flex-col gap-y-3 mt-10 justify-center ">
           {
             profileShow && (
@@ -91,16 +92,27 @@ const EmployerDashboard = ({ message, setMessage }) => {
 
 
           {/* Message panel */}
-          {message && (
-            <div
-              className={`absolute top-10 h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-2000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
-                }`}
-            >
-              <Message onClose={() => setMessage(false)} />
-            </div>
-          )}
+
         </div>
       </div>
+      {message && (
+        <div
+          className={`absolute top-10 min-h-screen h-screen right-0 min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform transition-transform duration-2000 ease-in-out ${message ? "translate-x-0" : "translate-x-full"
+            }`}
+        >
+          <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot} />
+        </div>
+      )}
+      {activeBot && (
+        <aside
+          className="fixed left-4 top-20 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
+          role="complementary"
+          aria-label="Chat Assistant"
+        >
+          <ChatBot />
+        </aside>
+      )}
+
     </div>
   );
 };

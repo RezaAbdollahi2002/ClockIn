@@ -389,6 +389,7 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
 
   const handleActiveBot = async () => {
     setActiveBot(!activeBot);
+    console.log(!activeBot);
   }
 
 
@@ -412,15 +413,9 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
                 <button className="text-xs md:text-sm" onClick={onClose}>
                   <IoCloseSharp className="bg-white w-4 h-4 text-purple-700" />
                 </button>
-                {
-                  !employerId && (
-                    <>
-                      <button className="text-md text-purple-800 font-bold" onClick={() => handleActiveBot()}>
+                <button className="text-md text-purple-800 font-bold" onClick={() => handleActiveBot()}>
                         Bot
                       </button>
-                    </>
-                  )
-                }
 
               </div>
               {/* Conversations finder  */}
@@ -566,7 +561,7 @@ const Message = ({ onClose, activeBot, setActiveBot }) => {
             {messages.map((msg, index) => (
               <div
                 key={msg.id || index}
-                className={`flex items-end ${msg.sender_id === me ? "justify-end " : "justify-start"
+                className={`flex items-end ${msg.sender_id === me ? "justify-start " : "justify-end"
                   }`}
               >
                 <div

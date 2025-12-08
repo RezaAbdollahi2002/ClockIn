@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import EmployerNavbar from '../../Navbar/EmployerNavbar';
 import Message from '../../Message/Message';
+import { set } from 'date-fns';
+import ChatBot from '../../AI/ChatBot';
 
-const EmployerSettings = ({ message, handleMessageState, setMessage }) => {
+const EmployerSettings = ({ message, handleMessageState, setMessage,activeBot,setActiveBot }) => {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -83,12 +85,22 @@ const EmployerSettings = ({ message, handleMessageState, setMessage }) => {
           <Outlet /> {/* This is where the selected page will load */}
         </div>
 
-        {message && (
+        
+      </div>
+      {message && (
           <div className="absolute top-10 right-0 h-screen min-w-[350px] bg-white shadow-xl z-50 p-4 overflow-auto transform translate-x-0 transition-transform duration-200">
-            <Message onClose={() => setMessage(false)} />
+            <Message onClose={() => setMessage(false)} activeBot={activeBot} setActiveBot={setActiveBot}/>
           </div>
         )}
-      </div>
+           {activeBot && (
+        <aside
+          className="fixed left-4 top-20 max-h-[600px] w-full max-w-[400px] rounded-lg border border-gray-300 bg-white shadow-xl"
+          role="complementary"
+          aria-label="Chat Assistant"
+        >
+          <ChatBot />
+        </aside>
+      )}
     </div>
   );
 };

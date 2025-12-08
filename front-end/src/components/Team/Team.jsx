@@ -36,7 +36,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
 
 
   return (
-    <div className="max-h-screen bg-[#E5E5E5] pt-0  h-screen  -mt-10">
+    <div className=" bg-gray-50 pt-0  min-h-screen  -mt-10">
       <div className="min-w-[600px]">
         {/* Navbar */}
         {isEmployee ? (
@@ -46,7 +46,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
         )}
 
         {/* Page container */}
-        <div className="w-full px-4 mt-10">
+        <div className="w-full px-4 mt-10 max-w-[1200px] mx-auto">
           {/* Team list */}
           <div className="w-full transition-all duration-700">
             <h1 className="text-lg md:text-xl lg:text-3xl font-bold text-purple-950 my-3">
@@ -76,7 +76,7 @@ const Team = ({ message, handleMessageState, setMessage, activeBot, setActiveBot
             </div>
 
             {/* Team members */}
-            <div className="overflow-auto max-h-screen">
+            <div className="overflow-auto max-h-[600px]">
               {filteredMembers.length > 0 ? (
                 filteredMembers.map((member) => (
                   <div
