@@ -14,7 +14,7 @@ load_dotenv()
 
 router = APIRouter(prefix="/gemini", tags=["Gemini"])
 
-genai.configure(api_key="AIzaSyCoD_6BFcASJclgwOO_pkZu_J2oE79Np7Q")
+genai.configure(api_key="AIzaSyBJJcHTIZU2kWeaa0Z3Fdl-rHXD2CuWs0Y")
 
 class Prompt(BaseModel):
     text: str
@@ -36,7 +36,7 @@ async def generate_text(prompt: Prompt):
     """
     Sends a prompt to Google Gemini and returns the response.
     """
-    model = genai.GenerativeModel("gemini-2.5-pro")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     response = model.generate_content(prompt.text)
     return {"response": response.text}
 
@@ -168,7 +168,7 @@ Return ONLY a valid JSON array of shift objects. Each shift must have this exact
 """
     
     try:
-        model = genai.GenerativeModel("gemini-2.5-pro")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
         response_text = response.text.strip()
         
